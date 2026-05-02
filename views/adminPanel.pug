@@ -1,0 +1,108 @@
+extends layout
+
+block content
+  nav(class="flex items-center justify-between px-8 py-4 border-b border-white/10")
+    div(class="flex items-center gap-4")
+      a(href="/home" class="text-white/60 hover:text-white text-sm") ← Inicio
+      span(class="text-white/20") /
+      span(class="text-sm text-white") Panel admin
+    span(class="text-xs bg-purple-500/20 border border-purple-400/30 text-purple-300 px-3 py-1 rounded-full") #{user.username}
+
+  main(class="max-w-6xl mx-auto px-6 py-10 space-y-16")
+
+    section
+      h2(class="text-3xl font-black mb-2 text-white") Animales pendientes
+        span(class="ml-3 text-lg text-amber-400 font-normal") #{pendientes.length}
+      if pendientes.length === 0
+        p(class="text-white/30 italic text-sm") No hay propuestas pendientes.
+      else
+        div(class="space-y-4")
+          each a in pendientes
+            div(class="bg-white/5 border border-white/10 rounded-2xl p-6")
+              div(class="flex items-start justify-between gap-4 flex-wrap mb-4")
+                div
+                  h3(class="text-lg font-black text-white")
+                    | #{a.nombre}
+                    span(class="ml-2 text-white/30 font-normal italic text-sm") #{a.nombreCientifico}
+                  p(class="text-white/40 text-xs mt-1") #{a.categoria} → #{a.subtipo} · Por: #{a.propuestoPor ? a.propuestoPor.username : 'desconocido'}
+                div(class="flex gap-3")
+                  form(method="POST" action="/admin/aprobar/" + a._id)
+                    button(type="submit" class="bg-green-500/20 hover:bg-green-500/40 border border-green-400/30 text-green-300 text-xs px-4 py-2 rounded-xl transition-colors") Aprobar
+                  form(method="POST" action="/admin/rechazar/" + a._id)
+                    input(type="hidden" name="nota" value="Rechazado por el administrador")
+                    button(type="submit" class="bg-red-500/20 hover:bg-red-500/40 border border-red-400/30 text-red-300 text-xs px-4 py-2 rounded-xl transition-colors") Rechazar
+              div(class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs")
+                if a.altura
+                  div(class="bg-white/5 rounded-xl p-3")
+                    p(class="text-white/30 mb-1") Altura
+                    p(class="font-bold text-white") #{a.altura}
+                if a.peso
+                  div(class="bg-white/5 rounded-xl p-3")
+                    p(class="text-white/30 mb-1") Peso
+                    p(class="font-bold text-white") #{a.peso}
+                if a.habitat
+                  div(class="bg-white/5 rounded-xl p-3")
+                    p(class="text-white/30 mb-1") Hábitat
+                    p(class="font-bold text-white") #{a.habitat}
+                if a.conservacion
+                  div(class="bg-white/5 rounded-xl p-3")
+                    p(class="text-white/30 mb-1") Conservación
+                    p(class="font-bold text-white") #{a.conservacion}
+              if a.curiosidades && a.curiosidades.length
+                p(class="mt-3 text-xs text-white/40") #{a.curiosidades.join(' · ')}
+
+    section
+      h2(class="text-3xl font-black mb-6 text-white") Crear usuario
+      if query && query.usuarioCreado
+        p(class="text-green-400 text-sm mb-4") ✅ Usuario creado correctamente.
+      if query && query.errorUsuario
+        p(class="text-red-400 text-sm mb-4") ❌ Error al crear usuario. El nombre puede estar duplicado.
+      form(method="POST" action="/admin/usuarios" class="bg-white/5 border border-white/10 rounded-2xl p-6")
+        div(class="grid grid-cols-1 md:grid-cols-3 gap-4")
+          div
+            label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Username
+            input(type="text" name="username" required placeholder="nuevo_usuario" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-400")
+          div
+            label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Contraseña
+            input(type="password" name="password" required placeholder="••••••••" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-400")
+          div
+            label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Rol
+            select(name="rol" class="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-purple-400")
+              option(value="usuario") Usuario
+              option(value="admin") Administrador
+              option(value="invitado") Invitado
+        button(type="submit" class="mt-4 bg-purple-500 hover:bg-purple-400 text-white font-bold py-3 px-8 rounded-xl transition-colors text-sm uppercase tracking-wide") Crear usuario
+
+    section
+      h2(class="text-3xl font-black mb-6 text-white") Usuarios registrados
+      div(class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden")
+        table(class="w-full text-sm")
+          thead
+            tr(class="border-b border-white/10")
+              th(class="text-left px-6 py-4 text-white/40 text-xs uppercase tracking-widest") Username
+              th(class="text-left px-6 py-4 text-white/40 text-xs uppercase tracking-widest") Rol
+              th(class="text-left px-6 py-4 text-white/40 text-xs uppercase tracking-widest") Registrado
+          tbody
+            each u in usuarios
+              tr(class="border-b border-white/5 hover:bg-white/5 transition-colors")
+                td(class="px-6 py-4 font-bold text-white") #{u.username}
+                td(class="px-6 py-4")
+                  - var badgeClass = u.rol === 'admin' ? 'bg-purple-500/20 border-purple-400/30 text-purple-300' : u.rol === 'usuario' ? 'bg-teal-500/20 border-teal-400/30 text-teal-300' : 'bg-white/10 border-white/20 text-white/50'
+                  span(class=`text-xs px-3 py-1 rounded-full border ${badgeClass}`) #{u.rol}
+                td(class="px-6 py-4 text-white/40") #{new Date(u.createdAt).toLocaleDateString('es-MX')}
+
+    section
+      h2(class="text-3xl font-black mb-6 text-white") Historial de revisiones
+      if !historial || historial.length === 0
+        p(class="text-white/30 italic text-sm") Sin historial aún.
+      else
+        div(class="space-y-2")
+          each a in historial
+            div(class="flex items-center justify-between bg-white/5 border border-white/5 rounded-xl px-6 py-4")
+              div
+                span(class="font-bold text-sm text-white") #{a.nombre}
+                span(class="text-white/30 text-xs ml-3") #{a.categoria} · #{a.propuestoPor ? a.propuestoPor.username : '?'}
+              - var estadoClass = a.estado === 'aprobado' ? 'bg-green-500/20 border-green-400/30 text-green-300' : 'bg-red-500/20 border-red-400/30 text-red-300'
+              span(class=`text-xs px-3 py-1 rounded-full border ${estadoClass}`) #{a.estado}
+
+  footer(class="text-center py-6 text-white/20 text-xs border-t border-white/5") AnimaliaDex · Panel de administración

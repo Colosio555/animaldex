@@ -6,38 +6,41 @@ block content
 
     div(class="relative z-10 w-full max-w-sm mx-4")
       div(class="text-center mb-8")
-        div(class="text-7xl mb-4") 🌿
-        h1(class="text-4xl font-black text-white tracking-tight") AnimaliaDex
-        p(class="text-green-400 text-sm mt-1 tracking-widest uppercase") Explorador de especies
+        div(class="text-5xl mb-4") 🌿
+        h1(class="text-3xl font-black text-white tracking-tight") Crear cuenta
+        p(class="text-green-400 text-sm mt-1") Únete a AnimaliaDex
 
       div(class="bg-white/10 backdrop-blur rounded-3xl p-8 border border-white/20")
-        if query && query.registrado
-          div(class="bg-green-500/20 border border-green-400/40 text-green-300 text-sm rounded-xl px-4 py-3 mb-6 text-center") ✅ Cuenta creada. Ahora inicia sesión.
         if error
           div(class="bg-red-500/20 border border-red-400/40 text-red-300 text-sm rounded-xl px-4 py-3 mb-6 text-center")= error
 
-        form(method="POST" action="/login")
+        form(method="POST" action="/registro")
           div(class="mb-5")
             label(class="block text-green-300 text-xs font-bold uppercase tracking-widest mb-2") Usuario
             input(
               type="text" name="username" required
-              placeholder="tu usuario"
+              placeholder="tu_usuario"
               class="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 transition-colors"
             )
-          div(class="mb-7")
+          div(class="mb-5")
             label(class="block text-green-300 text-xs font-bold uppercase tracking-widest mb-2") Contraseña
             input(
               type="password" name="password" required
-              placeholder="••••••••"
+              placeholder="mínimo 6 caracteres"
+              class="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 transition-colors"
+            )
+          div(class="mb-7")
+            label(class="block text-green-300 text-xs font-bold uppercase tracking-widest mb-2") Confirmar contraseña
+            input(
+              type="password" name="confirmar" required
+              placeholder="repite tu contraseña"
               class="w-full bg-white/10 border border-white/20 text-white placeholder-white/30 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 transition-colors"
             )
           button(
             type="submit"
             class="w-full bg-green-500 hover:bg-green-400 text-white font-bold py-3 rounded-xl transition-colors text-sm tracking-wide uppercase"
-          ) Entrar al explorador
+          ) Crear cuenta
 
         div(class="border-t border-white/10 mt-6 pt-6 text-center space-y-3")
-          a(href="/registro" class="block text-green-400 hover:text-green-300 text-xs transition-colors font-bold") ¿No tienes cuenta? Crear una →
-          a(href="/invitado" class="block text-white/40 hover:text-white/70 text-xs transition-colors") Entrar como invitado →
-
-        p(class="text-center text-white/20 text-xs mt-4") Acceso protegido · AnimaliaDex
+          a(href="/login" class="block text-white/40 hover:text-white/70 text-xs transition-colors") ¿Ya tienes cuenta? Inicia sesión →
+          a(href="/invitado" class="block text-white/30 hover:text-white/50 text-xs transition-colors") Entrar como invitado →

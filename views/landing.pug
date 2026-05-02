@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  div(style="background: linear-gradient(135deg, #0f172a 0%, #1a2e1f 50%, #0f172a 100%); min-height: 100vh;")
+
+    nav(class="flex items-center justify-between px-8 py-6")
+      div(class="flex items-center gap-3")
+        span(class="text-3xl") 🌿
+        span(class="text-2xl font-black text-white tracking-tight") AnimaliaDex
+      div(class="flex gap-3")
+        a(href="/login" class="text-sm text-white/60 hover:text-white px-4 py-2 rounded-xl border border-white/20 hover:border-white/40 transition-all") Iniciar sesión
+        a(href="/registro" class="text-sm bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-xl transition-colors font-bold") Crear cuenta
+
+    section(class="max-w-5xl mx-auto px-6 pt-20 pb-16 text-center")
+      div(class="inline-block bg-green-500/10 border border-green-400/20 text-green-400 text-xs uppercase tracking-widest px-4 py-2 rounded-full mb-8") Explorador educativo del reino animal
+      h1(class="text-6xl md:text-7xl font-black text-white leading-tight mb-6")
+        | El reino animal
+        br
+        span(class="text-green-400") en tus manos
+      p(class="text-white/50 text-lg max-w-2xl mx-auto mb-12 leading-relaxed") Una plataforma colaborativa para estudiantes de biología. Explora, aprende y contribuye con nuevas especies al catálogo más completo en español.
+
+      div(class="flex flex-col sm:flex-row gap-4 justify-center")
+        a(href="/registro" class="bg-green-500 hover:bg-green-400 text-white font-black px-8 py-4 rounded-2xl text-lg transition-colors") Crear cuenta gratis
+        a(href="/login" class="bg-white/10 hover:bg-white/20 text-white font-bold px-8 py-4 rounded-2xl text-lg transition-colors border border-white/20") Iniciar sesión
+        a(href="/invitado" class="text-white/40 hover:text-white/70 font-bold px-8 py-4 rounded-2xl text-lg transition-colors") Entrar como invitado →
+
+    section(class="max-w-5xl mx-auto px-6 pb-20")
+      div(class="grid grid-cols-1 md:grid-cols-3 gap-6")
+        div(class="bg-white/5 border border-white/10 rounded-3xl p-8 text-center")
+          div(class="text-5xl mb-4") 🦁
+          h3(class="text-white font-black text-xl mb-2") 9 grupos
+          p(class="text-white/40 text-sm") Vertebrados e invertebrados con fichas completas por especie
+        div(class="bg-white/5 border border-white/10 rounded-3xl p-8 text-center")
+          div(class="text-5xl mb-4") 🔬
+          h3(class="text-white font-black text-xl mb-2") Datos científicos
+          p(class="text-white/40 text-sm") Taxonomía, conservación, comportamiento y datos curiosos
+        div(class="bg-white/5 border border-white/10 rounded-3xl p-8 text-center")
+          div(class="text-5xl mb-4") 🤝
+          h3(class="text-white font-black text-xl mb-2") Colaborativo
+          p(class="text-white/40 text-sm") Propón nuevos animales y comparte publicaciones con la comunidad
+
+    footer(class="text-center py-8 text-white/20 text-xs border-t border-white/5") AnimaliaDex · Explorador de especies · 2026

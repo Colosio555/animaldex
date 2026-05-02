@@ -1,0 +1,118 @@
+extends layout
+
+block content
+  nav(class="flex items-center justify-between px-8 py-4 border-b border-white/10")
+    div(class="flex items-center gap-4")
+      a(href="/" class="text-white/60 hover:text-white text-sm") ← Inicio
+      span(class="text-white/20") /
+      span(class="text-sm") Proponer animal
+    div(class="flex items-center gap-4")
+      span(class="text-white/40 text-sm") #{user.username}
+      a(href="/logout" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-colors") Salir
+
+  main(class="max-w-3xl mx-auto px-6 py-12")
+    if query.exito
+      div(class="bg-green-500/20 border border-green-400/30 text-green-300 rounded-2xl px-6 py-4 mb-8 text-sm") ✅ Animal propuesto correctamente. Queda pendiente de revisión por un administrador.
+    if query.error
+      div(class="bg-red-500/20 border border-red-400/30 text-red-300 rounded-2xl px-6 py-4 mb-8 text-sm") ❌ Ocurrió un error. Intenta de nuevo.
+
+    h1(class="text-4xl font-black mb-2") Proponer animal
+    p(class="text-white/40 text-sm mb-10 uppercase tracking-widest") El animal quedará pendiente hasta que un admin lo apruebe
+
+    form(method="POST" action="/panel" class="space-y-6")
+      script(type="text/javascript").
+        const SUBTYPES_MAP = !{subtypesMap};
+        function actualizarSubtipos() {
+          const cat = document.getElementById('categoria').value;
+          const sel = document.getElementById('subtipo');
+          sel.innerHTML = '<option value="">-- Selecciona subtipo --</option>';
+          if (cat && SUBTYPES_MAP[cat]) {
+            SUBTYPES_MAP[cat].forEach(s => {
+              const o = document.createElement('option');
+              o.value = s; o.textContent = s;
+              sel.appendChild(o);
+            });
+          }
+        }
+
+      div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Nombre común *
+          input(type="text" name="nombre" required placeholder="Ej: León africano" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Nombre científico *
+          input(type="text" name="nombreCientifico" required placeholder="Ej: Panthera leo" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 italic")
+
+      div(class="grid grid-cols-1 md:grid-cols-2 gap-6")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Categoría *
+          select(name="categoria" id="categoria" required onchange="actualizarSubtipos()" class="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 appearance-none")
+            option(value="") -- Selecciona categoría --
+            each cat in categorias
+              option(value=cat)= cat.charAt(0).toUpperCase() + cat.slice(1)
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Subtipo *
+          select(name="subtipo" id="subtipo" required class="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 appearance-none")
+            option(value="") -- Selecciona subtipo --
+
+      div(class="grid grid-cols-2 md:grid-cols-4 gap-4")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Altura
+          input(type="text" name="altura" placeholder="Ej: 1.2 m" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Peso
+          input(type="text" name="peso" placeholder="Ej: 200 kg" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Edad máxima
+          input(type="text" name="edadMaxima" placeholder="Ej: 20 años" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Conservación
+          select(name="conservacion" class="w-full bg-white/5 border border-white/10 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 appearance-none")
+            option(value="") -- Estado --
+            option Preocupación menor (UICN)
+            option Casi amenazado (UICN)
+            option Vulnerable (UICN)
+            option En peligro (UICN)
+            option En peligro crítico (UICN)
+            option Extinto en estado silvestre (UICN)
+            option Extinto (UICN)
+            option Datos insuficientes (UICN)
+
+      div
+        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Hábitat
+        input(type="text" name="habitat" placeholder="Ej: Sabanas y praderas de África subsahariana" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+
+      div
+        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Alimentación
+        input(type="text" name="alimentacion" placeholder="Ej: Carnívoro — cebras, búfalos" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+
+      div
+        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Comportamiento
+        textarea(name="comportamiento" rows="2" placeholder="Describe el comportamiento del animal..." class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 resize-none")
+
+      div
+        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Curiosidades (una por línea)
+        textarea(name="curiosidades" rows="3" placeholder="Escribe una curiosidad por línea..." class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400 resize-none")
+
+      div(class="grid grid-cols-2 md:grid-cols-5 gap-4")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Reino
+          input(type="text" name="reino" placeholder="Animalia" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Filo
+          input(type="text" name="filo" placeholder="Chordata" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Clase
+          input(type="text" name="clase" placeholder="Mammalia" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Orden
+          input(type="text" name="orden" placeholder="Carnivora" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+        div
+          label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Familia
+          input(type="text" name="familia" placeholder="Felidae" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+
+      div
+        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") URL de imagen (opcional)
+        input(type="url" name="imagenUrl" placeholder="https://..." class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400")
+
+      button(type="submit" class="w-full bg-green-500 hover:bg-green-400 text-white font-bold py-4 rounded-2xl transition-colors tracking-wide uppercase text-sm") Enviar propuesta
