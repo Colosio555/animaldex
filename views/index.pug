@@ -1,0 +1,57 @@
+extends layout
+
+block content
+  -
+    const imgs = {
+      mamiferos:   'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=400&q=80',
+      aves:        'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400&q=80',
+      reptiles:    'https://images.unsplash.com/photo-1504450874802-0ba2bcd9b5ae?w=400&q=80',
+      anfibios:    'https://images.unsplash.com/photo-1459262838948-3e2de6c1ec80?w=400&q=80',
+      peces:       'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?w=400&q=80',
+      artropodos:  'https://images.unsplash.com/photo-1535083783855-ded51a9b5041?w=400&q=80',
+      moluscos:    'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=400&q=80',
+      equinodermos:'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=400&q=80',
+      anelidos:    'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&q=80'
+    }
+
+  nav(class="flex items-center justify-between px-8 py-4 border-b border-white/10")
+    div(class="flex items-center gap-3")
+      span(class="text-2xl") 🌿
+      span(class="text-xl font-black tracking-tight") AnimaliaDex
+    div(class="flex items-center gap-4")
+      span(class="text-white/50 text-sm") Hola, #{ locals.user ? locals.user.username : 'admin' }
+      a(href="/logout" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-colors") Cerrar sesión
+
+  main(class="flex-grow px-6 py-10 max-w-7xl mx-auto w-full")
+    h2(class="text-5xl font-black text-center mb-2") El Reino Animal
+    p(class="text-white/40 text-center text-sm mb-12 uppercase tracking-widest") Selecciona un grupo para explorar
+
+    section(class="mb-14")
+      div(class="flex items-center gap-3 mb-6")
+        div(class="h-px flex-grow bg-white/10")
+        h3(class="text-xs font-bold uppercase tracking-widest text-cyan-400 px-4") Vertebrados
+        div(class="h-px flex-grow bg-white/10")
+      div(class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4")
+        each v in vertebrados
+          if v
+            a(href=`/animal/${v.id}` class="group relative rounded-2xl overflow-hidden h-44 block")
+              img(src=imgs[v.id] alt=v.name class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500")
+              div(class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent")
+              div(class="absolute bottom-0 left-0 right-0 p-4")
+                p(class="font-black text-white text-sm uppercase tracking-wide")= v.name
+
+    section
+      div(class="flex items-center gap-3 mb-6")
+        div(class="h-px flex-grow bg-white/10")
+        h3(class="text-xs font-bold uppercase tracking-widest text-green-400 px-4") Invertebrados
+        div(class="h-px flex-grow bg-white/10")
+      div(class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4")
+        each inv in invertebrados
+          if inv
+            a(href=`/animal/${inv.id}` class="group relative rounded-2xl overflow-hidden h-44 block")
+              img(src=imgs[inv.id] alt=inv.name class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500")
+              div(class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent")
+              div(class="absolute bottom-0 left-0 right-0 p-4")
+                p(class="font-black text-white text-sm uppercase tracking-wide")= inv.name
+
+  footer(class="text-center py-6 text-white/20 text-xs border-t border-white/5") AnimaliaDex · Explorador de especies

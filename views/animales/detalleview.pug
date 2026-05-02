@@ -1,0 +1,94 @@
+extends ../layout
+
+block content
+  -
+    const subImgs = {
+      mamiferos:    ['https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=800&q=80','https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?w=800&q=80','https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=800&q=80'],
+      aves:         ['https://images.unsplash.com/photo-1516664035685-a9d7f5a3bbcd?w=800&q=80','https://images.unsplash.com/photo-1557053910-d9eadeed1c58?w=800&q=80','https://images.unsplash.com/photo-1501472312651-726afe119ff1?w=800&q=80'],
+      reptiles:     ['https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800&q=80','https://images.unsplash.com/photo-1591025207163-942350e47db2?w=800&q=80','https://images.unsplash.com/photo-1497752531616-c3afd9760a11?w=800&q=80'],
+      anfibios:     ['https://images.unsplash.com/photo-1612178537253-bccd437b730e?w=800&q=80','https://images.unsplash.com/photo-1597484661643-2f5fef640dd1?w=800&q=80','https://images.unsplash.com/photo-1559767949-0faa5c7e9992?w=800&q=80'],
+      peces:        ['https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80','https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80','https://images.unsplash.com/photo-1504450874802-0ba2bcd9b5ae?w=800&q=80'],
+      artropodos:   ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80','https://images.unsplash.com/photo-1534043464124-3be32fe000c9?w=800&q=80','https://images.unsplash.com/photo-1563681353614-958ceac74baa?w=800&q=80'],
+      moluscos:     ['https://images.unsplash.com/photo-1591025207163-942350e47db2?w=800&q=80','https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=800&q=80','https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80'],
+      equinodermos: ['https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&q=80','https://images.unsplash.com/photo-1559767949-0faa5c7e9992?w=800&q=80','https://images.unsplash.com/photo-1612178537253-bccd437b730e?w=800&q=80'],
+      anelidos:     ['https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80','https://images.unsplash.com/photo-1563681353614-958ceac74baa?w=800&q=80','https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80']
+    }
+    const imgs = subImgs[category.id] || []
+
+  nav(class="flex items-center justify-between px-8 py-4 border-b border-white/10")
+    a(href="/" class="flex items-center gap-2 text-white/60 hover:text-white transition-colors text-sm")
+      span ←
+      span Volver al inicio
+    span(class="text-white/30 text-sm") AnimaliaDex
+
+  main(class="flex-grow px-6 py-12 max-w-7xl mx-auto w-full")
+    div(class="mb-12")
+      h1(class="text-6xl font-black mb-2")= category.name
+      p(class="text-white/40 uppercase tracking-widest text-xs") Subgrupos y especies
+
+    each sub, i in category.subtypes
+      section(class="mb-20")
+        div(class="flex items-center gap-4 mb-8")
+          div(class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-2xl")= sub.icon
+          div
+            h2(class="text-3xl font-black")= sub.name
+            p(class="text-white/40 text-xs uppercase tracking-widest") Subgrupo
+
+        if sub.animales && sub.animales.length
+          div(class="space-y-8")
+            each animal in sub.animales
+              div(class="bg-white/5 border border-white/10 rounded-3xl overflow-hidden")
+                div(class="md:flex")
+                  if imgs[i]
+                    div(class="md:w-80 h-64 md:h-auto flex-shrink-0")
+                      img(src=imgs[i] alt=animal.nombre class="w-full h-full object-cover")
+                  div(class="flex-grow p-8")
+                    div(class="flex flex-wrap items-start justify-between gap-4 mb-6")
+                      div
+                        h3(class="text-2xl font-black")= animal.nombre
+                        p(class="text-white/40 italic text-sm mt-1")= animal.nombreCientifico
+                      if animal.conservacion
+                        span(class="text-xs bg-white/10 px-3 py-1 rounded-full border border-white/20")= animal.conservacion
+
+                    div(class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6")
+                      div(class="bg-white/5 rounded-2xl p-4")
+                        p(class="text-white/40 text-xs uppercase tracking-widest mb-1") Altura / Longitud
+                        p(class="text-sm font-bold")= animal.altura
+                      div(class="bg-white/5 rounded-2xl p-4")
+                        p(class="text-white/40 text-xs uppercase tracking-widest mb-1") Peso
+                        p(class="text-sm font-bold")= animal.peso
+                      div(class="bg-white/5 rounded-2xl p-4")
+                        p(class="text-white/40 text-xs uppercase tracking-widest mb-1") Edad máxima
+                        p(class="text-sm font-bold")= animal.edadMaxima
+                      div(class="bg-white/5 rounded-2xl p-4")
+                        p(class="text-white/40 text-xs uppercase tracking-widest mb-1") Hábitat
+                        p(class="text-sm font-bold")= animal.habitat
+                      div(class="bg-white/5 rounded-2xl p-4")
+                        p(class="text-white/40 text-xs uppercase tracking-widest mb-1") Alimentación
+                        p(class="text-sm font-bold")= animal.alimentacion
+
+                    div(class="mb-6")
+                      p(class="text-white/40 text-xs uppercase tracking-widest mb-2") Comportamiento
+                      p(class="text-sm text-white/80 leading-relaxed")= animal.comportamiento
+
+                    if animal.curiosidades && animal.curiosidades.length
+                      div(class="mb-6")
+                        p(class="text-white/40 text-xs uppercase tracking-widest mb-3") Datos curiosos
+                        ul(class="space-y-2")
+                          each dato in animal.curiosidades
+                            li(class="flex items-start gap-2 text-sm text-white/80")
+                              span(class="text-yellow-400 mt-0.5 flex-shrink-0") ★
+                              span= dato
+
+                    div(class="border-t border-white/10 pt-4")
+                      p(class="text-white/30 text-xs uppercase tracking-widest mb-2") Clasificación taxonómica
+                      div(class="flex flex-wrap gap-2")
+                        each key in ['reino','filo','clase','orden','familia']
+                          if animal[key]
+                            span(class="text-xs bg-white/5 border border-white/10 px-3 py-1 rounded-full")
+                              span(class="text-white/40")= key.charAt(0).toUpperCase() + key.slice(1) + ': '
+                              span(class="text-white/80")= animal[key]
+        else
+          p(class="text-white/30 italic text-sm") Próximamente más información sobre este subgrupo.
+
+  footer(class="text-center py-6 text-white/20 text-xs border-t border-white/5") AnimaliaDex · Explorador de especies
