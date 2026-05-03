@@ -33,12 +33,8 @@ exports.proponer = async (req, res) => {
       comportamiento, curiosidades, conservacion,
       reino, filo, clase, orden, familia, imagenUrl
     } = req.body;
-
-    const curiosidadesArr = (curiosidades || '')
-      .split('\n').map(c => c.trim()).filter(Boolean);
-
+    const curiosidadesArr = (curiosidades || '').split('\n').map(c => c.trim()).filter(Boolean);
     const usuario = await Usuario.findOne({ username: req.session.user.username });
-
     await AnimalPropuesto.create({
       nombre, nombreCientifico, categoria, subtipo,
       altura, peso, habitat, alimentacion, edadMaxima,
@@ -46,7 +42,6 @@ exports.proponer = async (req, res) => {
       conservacion, reino, filo, clase, orden, familia, imagenUrl,
       propuestoPor: usuario._id
     });
-
     res.redirect('/panel?exito=1');
   } catch (err) {
     console.error(err);
@@ -55,26 +50,18 @@ exports.proponer = async (req, res) => {
 };
 
 exports.renderAdmin = async (req, res) => {
-  const pendientes = await AnimalPropuesto.find({ estado: 'pendiente' })
-    .populate('propuestoPor', 'username');
-  const historial = await AnimalPropuesto.find({ estado: { $ne: 'pendiente' } })
-    .populate('propuestoPor', 'username')
-    .populate('revisadoPor', 'username')
+  const pendientes = await AnimalPropuesto.find({ estado: 'pendiente' }).populate('propuestoPor', 'username');
+  const historial  = await AnimalPropuesto.find({ estado: { $ne: 'pendiente' } })
+    .populate('propuestoPor', 'username').populate('revisadoPor', 'username')
     .sort({ updatedAt: -1 }).limit(20);
   const usuarios = await Usuario.find({}).select('username rol createdAt');
-  res.render('adminPanel', {
-    user: req.session.user,
-    pendientes, historial, usuarios,
-    query: req.query
-  });
+  res.render('adminPanel', { user: req.session.user, pendientes, historial, usuarios, query: req.query });
 };
 
 exports.aprobar = async (req, res) => {
   const admin  = await Usuario.findOne({ username: req.session.user.username });
   const animal = await AnimalPropuesto.findByIdAndUpdate(req.params.id,
-    { estado: 'aprobado', revisadoPor: admin._id },
-    { new: true }
-  );
+    { estado: 'aprobado', revisadoPor: admin._id }, { new: true });
   await Publicacion.create({
     tipo: 'animal_nuevo',
     titulo: `Nuevo animal aprobado: ${animal.nombre}`,
@@ -90,8 +77,7 @@ exports.rechazar = async (req, res) => {
   const { nota } = req.body;
   const admin = await Usuario.findOne({ username: req.session.user.username });
   await AnimalPropuesto.findByIdAndUpdate(req.params.id, {
-    estado: 'rechazado',
-    revisadoPor: admin._id,
+    estado: 'rechazado', revisadoPor: admin._id,
     notaRevision: nota || 'Rechazado por el administrador'
   });
   res.redirect('/admin');
@@ -108,13 +94,49 @@ exports.crearUsuario = async (req, res) => {
   }
 };
 
+// ── Publicaciones ─────────────────────────────────────────────
 exports.publicar = async (req, res) => {
   try {
-    const { titulo, contenido, imagen } = req.body;
-    const autor = await Usuario.findOne({ username: req.session.user.username });
+    const { titulo, contenido } = req.body;
+    const imagen = req.file ? `/uploads/${req.file.filename}` : '';
+    const autor  = await Usuario.findOne({ username: req.session.user.username });
     await Publicacion.create({ tipo: 'publicacion', titulo, contenido, autor: autor._id, imagen });
     res.redirect('/home?publicado=1');
   } catch (err) {
+    console.error(err);
     res.redirect('/home?errorPublicacion=1');
+  }
+};
+
+exports.toggleLike = async (req, res) => {
+  try {
+    const usuario = await Usuario.findOne({ username: req.session.user.username });
+    const pub     = await Publicacion.findById(req.params.id);
+    if (!pub) return res.redirect('/home');
+    const yaLikeo = pub.likes.some(id => id.equals(usuario._id));
+    if (yaLikeo) {
+      pub.likes.pull(usuario._id);
+    } else {
+      pub.likes.push(usuario._id);
+    }
+    await pub.save();
+    res.redirect('/home#pub-' + pub._id);
+  } catch (err) {
+    console.error(err);
+    res.redirect('/home');
+  }
+};
+
+exports.comentar = async (req, res) => {
+  try {
+    const { contenido } = req.body;
+    const autor = await Usuario.findOne({ username: req.session.user.username });
+    await Publicacion.findByIdAndUpdate(req.params.id, {
+      $push: { comentarios: { contenido, autor: autor._id } }
+    });
+    res.redirect('/home#pub-' + req.params.id);
+  } catch (err) {
+    console.error(err);
+    res.redirect('/home');
   }
 };

@@ -1,115 +1,264 @@
 extends layout
 
 block content
-  -
-    const imgs = {
-      mamiferos:    'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=400&q=80',
-      aves:         'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=400&q=80',
-      reptiles:     'https://images.unsplash.com/photo-1504450874802-0ba2bcd9b5ae?w=400&q=80',
-      anfibios:     'https://images.unsplash.com/photo-1459262838948-3e2de6c1ec80?w=400&q=80',
-      peces:        'https://images.unsplash.com/photo-1534043464124-3be32fe000c9?w=400&q=80',
-      artropodos:   'https://images.unsplash.com/photo-1535083783855-ded51a9b5041?w=400&q=80',
-      moluscos:     'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=400&q=80',
-      equinodermos: 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=400&q=80',
-      anelidos:     'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&q=80'
+  style.
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-20px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card-animal {
+      opacity: 0;
+      animation: scaleIn 0.5s ease forwards;
+    }
+    .hero-title {
+      opacity: 0;
+      animation: fadeInUp 0.7s ease 0.1s forwards;
+    }
+    .hero-sub {
+      opacity: 0;
+      animation: fadeInUp 0.7s ease 0.3s forwards;
+    }
+    .hero-cta {
+      opacity: 0;
+      animation: fadeInUp 0.7s ease 0.5s forwards;
+    }
+    .seccion-label {
+      opacity: 0;
+      animation: fadeInLeft 0.6s ease forwards;
+    }
+    .feed-item {
+      opacity: 0;
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    .nav-animate {
+      opacity: 0;
+      animation: slideDown 0.5s ease forwards;
+    }
+    .card-animal:hover img {
+      transform: scale(1.1);
+    }
+    .card-animal img {
+      transition: transform 0.7s ease;
     }
 
-  nav(class="flex items-center justify-between px-8 py-4 border-b border-white/10")
+  -
+    const imgs = {
+      mamiferos:    'https://i.pinimg.com/736x/32/40/95/3240952750609002e41171b717f3d238.jpg',
+      aves:         'https://i1-e.pinimg.com/1200x/a0/8a/a9/a08aa9e6630c2048c1f6342dda158a4a.jpg',
+      reptiles:     'https://i.pinimg.com/736x/45/bf/f2/45bff221e32b3f762e297c82440ffb7c.jpg',
+      anfibios:     'https://i.pinimg.com/736x/9b/f5/c4/9bf5c4d5fdc51568fa9436bb41bb7b6b.jpg',
+      peces:        'https://i1-e.pinimg.com/1200x/c3/be/6a/c3be6a4caafee9d54fe15e60859f1f6d.jpg',
+      artropodos:   'https://i.pinimg.com/736x/39/8b/44/398b44161c8577651cfb7b0afc334100.jpg',
+      moluscos:     'https://i.pinimg.com/736x/a0/e5/7e/a0e57e0a2fa5fabd84b6cf0ef7e8681d.jpg',
+      equinodermos: 'https://i1-e.pinimg.com/1200x/40/6c/3a/406c3a0f3c582e12cbe2b0b9b2c886b2.jpg',
+      anelidos:     'https://i.pinimg.com/736x/a1/88/0b/a1880bee2a0e348f6a43ee553d013685.jpg'
+    }
+    const subtitulos = {
+      mamiferos:    'Gigantes y Cuidadores',
+      aves:         'Maestros del Vuelo',
+      reptiles:     'Escamas y Sigilo',
+      anfibios:     'Agua y Tierra',
+      peces:        'Reyes del Mar',
+      artropodos:   'Exoesqueletos',
+      moluscos:     'Blandos y Letales',
+      equinodermos: 'Estrellas del Fondo',
+      anelidos:     'Del Suelo al Mar'
+    }
+
+  nav(class="nav-animate flex items-center justify-between px-8 py-4 border-b border-white/10 sticky top-0 z-50 bg-slate-950/95 backdrop-blur")
     div(class="flex items-center gap-3")
       span(class="text-2xl") 🌿
       a(href="/home" class="text-xl font-black tracking-tight text-white") AnimaliaDex
-    div(class="flex items-center gap-3 flex-wrap justify-end")
-      span(class="text-white/40 text-sm") #{user ? user.username : ''}
-      if user && user.rol === 'invitado'
-        a(href="/registro" class="text-xs bg-green-500/20 border border-green-400/30 text-green-300 px-4 py-2 rounded-full hover:bg-green-500/40 transition-colors") Crear cuenta
+    div(class="hidden md:flex items-center gap-8")
+      a(href="/home" class="text-sm text-white/70 hover:text-white transition-colors font-medium") Explorar
+      a(href="/panel" class="text-sm text-white/70 hover:text-white transition-colors font-medium") Comunidad
+    div(class="flex items-center gap-3")
       if user && user.rol !== 'invitado'
-        a(href="/panel" class="text-xs bg-green-500/20 hover:bg-green-500/40 border border-green-400/30 text-green-300 px-4 py-2 rounded-full transition-colors") + Proponer animal
+        a(href="/panel" class="text-sm bg-green-500 hover:bg-green-400 text-white font-bold px-4 py-2 rounded-full transition-colors") + Proponer animal
       if user && user.rol === 'admin'
-        a(href="/admin" class="text-xs bg-purple-500/20 hover:bg-purple-500/40 border border-purple-400/30 text-purple-300 px-4 py-2 rounded-full transition-colors") Panel admin
+        a(href="/admin" class="text-xs bg-purple-500/20 hover:bg-purple-500/40 border border-purple-400/30 text-purple-300 px-4 py-2 rounded-full transition-colors") Admin
+      span(class="text-white/40 text-sm hidden sm:block") #{user ? user.username : ''}
       a(href="/logout" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full transition-colors text-white/60") Salir
 
-  main(class="flex-grow max-w-7xl mx-auto w-full px-6 py-10")
+  main(class="flex-grow")
 
-    if query && query.publicado
-      div(class="bg-green-500/20 border border-green-400/30 text-green-300 rounded-2xl px-6 py-3 mb-6 text-sm") ✅ Publicación enviada correctamente.
-
-    div(class="grid grid-cols-1 lg:grid-cols-3 gap-10")
-
-      div(class="lg:col-span-2")
-        h2(class="text-5xl font-black mb-2") El Reino Animal
-        p(class="text-white/40 text-sm mb-10 uppercase tracking-widest") Selecciona un grupo para explorar
-
+    div(class="relative overflow-hidden" style="background: linear-gradient(180deg, #0a1628 0%, #0f172a 100%);")
+      div(class="absolute inset-0 opacity-5" style="background-image: radial-gradient(circle, #4ade80 1px, transparent 1px); background-size: 40px 40px;")
+      div(class="max-w-7xl mx-auto px-6 py-12 text-center relative z-10")
+        h1(class="hero-title text-5xl md:text-6xl font-black text-white mb-3")
+          | Explora el
+          span(class="text-green-400") &nbsp;Reino Animal
+        p(class="hero-sub text-white/40 text-base max-w-xl mx-auto mb-8") Descubre, aprende y comparte sobre las especies más fascinantes del planeta.
         if user && user.rol === 'invitado'
-          div(class="bg-white/5 border border-white/10 rounded-2xl px-6 py-4 mb-8 text-sm text-white/50")
-            | Estás en modo invitado.
-            a(href="/registro" class="text-green-400 hover:text-green-300 ml-2 underline") Crea una cuenta para proponer animales.
+          div(class="hero-cta flex gap-3 justify-center")
+            a(href="/registro" class="bg-green-500 hover:bg-green-400 text-white font-bold px-6 py-3 rounded-2xl text-sm transition-colors") Crear cuenta gratis
+            a(href="/login" class="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-2xl text-sm transition-colors border border-white/20") Iniciar sesión
 
-        section(class="mb-12")
-          div(class="flex items-center gap-3 mb-5")
-            div(class="h-px flex-grow bg-white/10")
-            h3(class="text-xs font-bold uppercase tracking-widest text-cyan-400 px-4") Vertebrados
-            div(class="h-px flex-grow bg-white/10")
-          div(class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3")
-            each v in vertebrados
-              if v
-                a(href=`/animal/${v.id}` class="group relative rounded-2xl overflow-hidden h-40 block")
-                  img(src=imgs[v.id] alt=v.name class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500")
-                  div(class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent")
-                  div(class="absolute bottom-0 left-0 right-0 p-3")
-                    p(class="font-black text-white text-xs uppercase tracking-wide")= v.name
+    div(class="max-w-7xl mx-auto px-4 py-10")
+      if query && query.publicado
+        div(class="bg-green-500/20 border border-green-400/30 text-green-300 rounded-2xl px-6 py-3 mb-6 text-sm") ✅ Publicación enviada.
 
-        section
-          div(class="flex items-center gap-3 mb-5")
-            div(class="h-px flex-grow bg-white/10")
-            h3(class="text-xs font-bold uppercase tracking-widest text-green-400 px-4") Invertebrados
-            div(class="h-px flex-grow bg-white/10")
-          div(class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3")
-            each inv in invertebrados
-              if inv
-                a(href=`/animal/${inv.id}` class="group relative rounded-2xl overflow-hidden h-40 block")
-                  img(src=imgs[inv.id] alt=inv.name class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500")
-                  div(class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent")
-                  div(class="absolute bottom-0 left-0 right-0 p-3")
-                    p(class="font-black text-white text-xs uppercase tracking-wide")= inv.name
+      div(class="grid grid-cols-1 xl:grid-cols-4 gap-8")
 
-      div(class="lg:col-span-1")
-        h2(class="text-2xl font-black mb-6") Comunidad
-          span(class="ml-2 text-white/30 text-base font-normal") feed
+        div(class="xl:col-span-3")
 
-        if user && user.rol !== 'invitado'
-          form(method="POST" action="/publicar" class="bg-white/5 border border-white/10 rounded-2xl p-5 mb-6")
-            input(
-              type="text" name="titulo"
-              placeholder="Título (opcional)"
-              class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-2 text-sm mb-3 focus:outline-none focus:border-green-400"
-            )
-            textarea(
-              name="contenido" rows="3" required
-              placeholder="¿Qué quieres compartir con la comunidad?"
-              class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-2 text-sm mb-3 focus:outline-none focus:border-green-400 resize-none"
-            )
-            button(type="submit" class="w-full bg-green-500 hover:bg-green-400 text-white text-xs font-bold py-2 rounded-xl transition-colors uppercase tracking-wide") Publicar
+          section(class="mb-10")
+            div(class="seccion-label flex items-center gap-4 mb-5" style="animation-delay: 0.1s")
+              div(class="h-px flex-grow bg-white/10")
+              span(class="text-xs font-black uppercase tracking-widest text-cyan-400 px-4 py-1.5 bg-cyan-400/10 rounded-full border border-cyan-400/20") Vertebrados
+              div(class="h-px flex-grow bg-white/10")
 
-        if feed && feed.length
-          div(class="space-y-4")
-            each item in feed
-              div(class=`rounded-2xl p-5 border ${item.tipo === 'animal_nuevo' ? 'bg-green-500/5 border-green-400/20' : 'bg-white/5 border-white/10'}`)
-                div(class="flex items-center gap-3 mb-3")
-                  div(class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-sm font-black text-white/60")
-                    | #{item.autor ? item.autor.username.charAt(0).toUpperCase() : '?'}
-                  div
-                    p(class="text-white/80 text-xs font-bold") #{item.autor ? item.autor.username : 'Sistema'}
-                    p(class="text-white/30 text-xs") #{new Date(item.createdAt).toLocaleDateString('es-MX', { day:'numeric', month:'short', year:'numeric' })}
-                  if item.tipo === 'animal_nuevo'
-                    span(class="ml-auto text-xs bg-green-500/20 border border-green-400/30 text-green-300 px-2 py-1 rounded-full") Nuevo animal
-                if item.titulo
-                  p(class="text-white font-bold text-sm mb-1")= item.titulo
-                p(class="text-white/60 text-sm leading-relaxed")= item.contenido
-                if item.imagen
-                  img(src=item.imagen alt="imagen" class="w-full rounded-xl mt-3 object-cover h-32")
-        else
-          div(class="text-center py-12 text-white/20")
-            p(class="text-4xl mb-3") 🌿
-            p(class="text-sm") Sé el primero en publicar algo.
+            div(class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4")
+              each v, i in vertebrados
+                if v
+                  a(href=`/animal/${v.id}` class="card-animal group relative rounded-3xl overflow-hidden block" style=`height:200px; animation-delay:${0.1 + i * 0.08}s`)
+                    img(src=imgs[v.id] alt=v.name class="w-full h-full object-cover")
+                    div(class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent")
+                    div(class="absolute inset-0 bg-green-500/0 group-hover:bg-green-500/10 transition-colors duration-300")
+                    div(class="absolute bottom-0 left-0 right-0 p-4")
+                      p(class="font-black text-white text-sm uppercase tracking-wide leading-tight")= v.name
+                      p(class="text-white/50 text-xs mt-0.5 group-hover:text-green-300 transition-colors")= subtitulos[v.id]
+                    div(class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0")
+                      span(class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full") Ver →
 
-  footer(class="text-center py-6 text-white/20 text-xs border-t border-white/5") AnimaliaDex · Explorador de especies
+          section
+            div(class="seccion-label flex items-center gap-4 mb-5" style="animation-delay: 0.5s")
+              div(class="h-px flex-grow bg-white/10")
+              span(class="text-xs font-black uppercase tracking-widest text-green-400 px-4 py-1.5 bg-green-400/10 rounded-full border border-green-400/20") Invertebrados
+              div(class="h-px flex-grow bg-white/10")
+
+            div(class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4")
+              each inv, i in invertebrados
+                if inv
+                  a(href=`/animal/${inv.id}` class="card-animal group relative rounded-3xl overflow-hidden block" style=`height:200px; animation-delay:${0.55 + i * 0.08}s`)
+                    img(src=imgs[inv.id] alt=inv.name class="w-full h-full object-cover")
+                    div(class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent")
+                    div(class="absolute inset-0 bg-green-500/0 group-hover:bg-green-500/10 transition-colors duration-300")
+                    div(class="absolute bottom-0 left-0 right-0 p-4")
+                      p(class="font-black text-white text-sm uppercase tracking-wide leading-tight")= inv.name
+                      p(class="text-white/50 text-xs mt-0.5 group-hover:text-green-300 transition-colors")= subtitulos[inv.id]
+                    div(class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0")
+                      span(class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full") Ver →
+
+        //- ── Feed ──
+        div(class="xl:col-span-1")
+          div(class="sticky top-20")
+
+            if user && user.rol !== 'invitado'
+              div(class="feed-item bg-white/5 border border-white/10 rounded-2xl mb-5 overflow-hidden" style="animation-delay: 0.2s")
+                div(class="px-4 pt-4 pb-3")
+                  div(class="flex items-center gap-3")
+                    div(class="w-8 h-8 rounded-full bg-green-500/20 border border-green-400/30 flex items-center justify-center text-xs font-black text-green-300 flex-shrink-0")
+                      | #{user.username.charAt(0).toUpperCase()}
+                    input(
+                      type="text"
+                      placeholder="Comparte tu hallazgo..."
+                      readonly
+                      onclick="document.getElementById('formPublicar').classList.toggle('hidden')"
+                      class="flex-grow bg-white/5 border border-white/10 text-white/40 placeholder-white/30 rounded-full px-3 py-2 text-xs cursor-pointer hover:bg-white/10 transition-colors focus:outline-none"
+                    )
+                div(id="formPublicar" class="hidden border-t border-white/10 px-4 py-4")
+                  form(method="POST" action="/publicar" enctype="multipart/form-data")
+                    input(type="text" name="titulo" placeholder="Título (opcional)" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-3 py-2 text-xs mb-2 focus:outline-none focus:border-green-400")
+                    textarea(name="contenido" rows="3" required placeholder="¿Qué quieres compartir?" class="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-3 py-2 text-xs mb-2 focus:outline-none focus:border-green-400 resize-none")
+                    div(class="flex items-center justify-between")
+                      label(class="flex items-center gap-1 cursor-pointer text-white/30 hover:text-green-400 text-xs transition-colors")
+                        input(type="file" name="imagen" accept="image/*" class="hidden" onchange="mostrarNombre(this)")
+                        span 📷 Foto
+                        span#nombreArchivo(class="text-white/20 text-xs ml-1")
+                      button(type="submit" class="bg-green-500 hover:bg-green-400 text-white text-xs font-bold py-1.5 px-4 rounded-xl transition-colors") Publicar
+
+            div(class="flex items-center justify-between mb-3")
+              h2(class="text-sm font-black text-white uppercase tracking-widest") Comunidad
+              span(class="text-white/20 text-xs") #{new Date().toLocaleDateString('es-MX', {day:'numeric', month:'short'})}
+
+            if feed && feed.length
+              div(class="space-y-3")
+                each item, i in feed
+                  div(id=`pub-${item._id}` class="feed-item bg-slate-900 border border-white/10 rounded-2xl overflow-hidden" style=`animation-delay:${0.3 + i * 0.1}s`)
+                    div(class="px-4 pt-4 pb-2")
+                      div(class="flex items-center gap-2 mb-2")
+                        div(class=`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0 ${item.tipo === 'animal_nuevo' ? 'bg-green-500/30 text-green-300' : 'bg-blue-500/20 text-blue-300'}`)
+                          | #{item.autor ? item.autor.username.charAt(0).toUpperCase() : '?'}
+                        div
+                          p(class="text-white text-xs font-bold leading-tight") #{item.autor ? item.autor.username : 'Sistema'}
+                          p(class="text-white/20 text-xs") #{new Date(item.createdAt).toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'})}
+                        if item.tipo === 'animal_nuevo'
+                          span(class="ml-auto text-xs bg-green-500/20 border border-green-400/20 text-green-300 px-1.5 py-0.5 rounded-full") 🐾
+                      if item.titulo
+                        p(class="text-white font-bold text-xs mb-1")= item.titulo
+                      p(class="text-white/60 text-xs leading-relaxed line-clamp-3")= item.contenido
+
+                    if item.imagen
+                      img(src=item.imagen alt="imagen" class="w-full object-cover max-h-48")
+
+                    div(class="px-4 py-2")
+                      div(class="flex items-center justify-between text-white/20 text-xs mb-2")
+                        span 👍 #{item.likes ? item.likes.length : 0}
+                        button(onclick=`toggleComentarios('${item._id}')` class="hover:text-white/50 transition-colors") 💬 #{item.comentarios ? item.comentarios.length : 0}
+                      div(class="flex gap-1 border-t border-white/5 pt-2")
+                        form(method="POST" action=`/like/${item._id}` class="flex-1")
+                          button(type="submit" class="w-full flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs text-white/30 hover:bg-white/5 hover:text-blue-400 transition-all") 👍 Me gusta
+                        button(onclick=`toggleComentarios('${item._id}')` class="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs text-white/30 hover:bg-white/5 hover:text-green-400 transition-all") 💬 Comentar
+
+                    div(id=`comentarios-${item._id}` class="hidden border-t border-white/5 bg-black/20 px-4 py-3")
+                      if item.comentarios && item.comentarios.length
+                        div(class="space-y-2 mb-3")
+                          each com in item.comentarios
+                            div(class="flex gap-2")
+                              div(class="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-xs font-black text-white/40 flex-shrink-0")
+                                | #{com.autor ? com.autor.username.charAt(0).toUpperCase() : '?'}
+                              div(class="bg-white/5 rounded-xl px-2 py-1 flex-grow")
+                                p(class="text-white/60 text-xs font-bold") #{com.autor ? com.autor.username : 'Usuario'}
+                                p(class="text-white/50 text-xs")= com.contenido
+                      if user && user.rol !== 'invitado'
+                        form(method="POST" action=`/comentar/${item._id}` class="flex gap-1 mt-2")
+                          input(type="text" name="contenido" required placeholder="Comentar..." class="flex-grow bg-white/10 border border-white/10 text-white placeholder-white/20 rounded-full px-3 py-1 text-xs focus:outline-none focus:border-green-400")
+                          button(type="submit" class="bg-green-500 hover:bg-green-400 text-white text-xs font-bold px-2 py-1 rounded-full transition-colors") →
+                      else
+                        p(class="text-white/20 text-xs italic text-center mt-1")
+                          a(href="/login" class="text-green-400") Inicia sesión
+                          |  para comentar.
+            else
+              div(class="feed-item text-center py-10 text-white/20 bg-white/5 border border-white/10 rounded-2xl" style="animation-delay:0.3s")
+                p(class="text-3xl mb-2") 🌿
+                p(class="text-xs font-bold") Sin publicaciones hoy
+                p(class="text-xs mt-1") ¡Sé el primero!
+
+  script.
+    function toggleComentarios(id) {
+      const el = document.getElementById('comentarios-' + id);
+      el.classList.toggle('hidden');
+    }
+    function mostrarNombre(input) {
+      document.getElementById('nombreArchivo').textContent = input.files[0] ? input.files[0].name : '';
+    }
+
+    // Animación al hacer scroll con IntersectionObserver
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card-animal, .feed-item, .seccion-label').forEach(el => {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
+
+  footer(class="text-center py-6 text-white/20 text-xs border-t border-white/5 mt-10") AnimaliaDex · Explorador de especies
