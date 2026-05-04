@@ -52,6 +52,64 @@ block content
     .card-animal img {
       transition: transform 0.7s ease;
     }
+    .hero-search-wrap {
+      opacity: 0;
+      animation: fadeInUp 0.7s ease 0.45s forwards;
+    }
+    .hero-search {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 480px;
+      margin: 0 auto;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .hero-search:focus-within {
+      border-color: rgba(74,222,128,0.45);
+      background: rgba(74,222,128,0.04);
+    }
+    .hero-search input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-size: 0.9rem;
+      padding: 13px 18px;
+    }
+    .hero-search input::placeholder { color: rgba(255,255,255,0.28); }
+    .hero-search button {
+      background: #22c55e;
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      padding: 13px 22px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .hero-search button:hover { background: #4ade80; }
+    .nav-search-btn {
+      display: flex; align-items: center; gap: 6px;
+      color: rgba(255,255,255,0.6);
+      font-size: 13px; font-weight: 500;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 6px 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .nav-search-btn:hover {
+      background: rgba(74,222,128,0.1);
+      border-color: rgba(74,222,128,0.25);
+      color: #4ade80;
+    }
 
   -
     const imgs = {
@@ -81,9 +139,13 @@ block content
     div(class="flex items-center gap-3")
       span(class="text-2xl") 🌿
       a(href="/home" class="text-xl font-black tracking-tight text-white") AnimaliaDex
-    div(class="hidden md:flex items-center gap-8")
+    div(class="hidden md:flex items-center gap-6")
       a(href="/home" class="text-sm text-white/70 hover:text-white transition-colors font-medium") Explorar
       a(href="/panel" class="text-sm text-white/70 hover:text-white transition-colors font-medium") Comunidad
+      //- ── BUSCADOR EN NAVBAR ──
+      a(href="/buscar" class="nav-search-btn")
+        span 🔍
+        span Buscar
     div(class="flex items-center gap-3")
       if user && user.rol !== 'invitado'
         a(href="/panel" class="text-sm bg-green-500 hover:bg-green-400 text-white font-bold px-4 py-2 rounded-full transition-colors") + Proponer animal
@@ -100,7 +162,17 @@ block content
         h1(class="hero-title text-5xl md:text-6xl font-black text-white mb-3")
           | Explora el
           span(class="text-green-400") &nbsp;Reino Animal
-        p(class="hero-sub text-white/40 text-base max-w-xl mx-auto mb-8") Descubre, aprende y comparte sobre las especies más fascinantes del planeta.
+        p(class="hero-sub text-white/40 text-base max-w-xl mx-auto mb-6") Descubre, aprende y comparte sobre las especies más fascinantes del planeta.
+
+        //- ── BARRA DE BÚSQUEDA EN HERO ──
+        div(class="hero-search-wrap mb-6")
+          form(method="GET" action="/buscar" class="hero-search")
+            input(
+              type="text" name="q"
+              placeholder="Busca un animal, dieta, hábitat..."
+            )
+            button(type="submit") 🔍 Buscar
+
         if user && user.rol === 'invitado'
           div(class="hero-cta flex gap-3 justify-center")
             a(href="/registro" class="bg-green-500 hover:bg-green-400 text-white font-bold px-6 py-3 rounded-2xl text-sm transition-colors") Crear cuenta gratis
@@ -246,7 +318,6 @@ block content
       document.getElementById('nombreArchivo').textContent = input.files[0] ? input.files[0].name : '';
     }
 
-    // Animación al hacer scroll con IntersectionObserver
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {

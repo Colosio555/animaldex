@@ -1,0 +1,160 @@
+extends layout
+
+block content
+  style.
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(12px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    .result-card {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 16px;
+      text-decoration: none;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      animation: fadeUp 0.4s ease both;
+    }
+    .result-card:hover {
+      background: rgba(255,255,255,0.07);
+      border-color: rgba(74,222,128,0.25);
+      transform: translateY(-2px);
+    }
+    .result-img {
+      width: 80px; height: 80px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.05);
+    }
+    .result-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.2);
+      color: #4ade80;
+      margin-bottom: 6px;
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: white;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .search-input:focus {
+      border-color: rgba(74,222,128,0.5);
+      background: rgba(74,222,128,0.04);
+    }
+    .search-input::placeholder { color: rgba(255,255,255,0.25); }
+    .search-btn {
+      background: #22c55e; color: white;
+      font-weight: 700; font-size: 0.9rem;
+      border: none; border-radius: 14px;
+      padding: 14px 28px; cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .search-btn:hover { background: #4ade80; }
+    .pill-sugg {
+      display: inline-block;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+      font-size: 12px; padding: 6px 14px;
+      border-radius: 20px; cursor: pointer;
+      transition: all 0.2s; text-decoration: none;
+    }
+    .pill-sugg:hover {
+      background: rgba(74,222,128,0.1);
+      border-color: rgba(74,222,128,0.3);
+      color: #4ade80;
+    }
+
+  //- Nav
+  nav(style="display:flex; align-items:center; justify-content:space-between; padding:16px 32px; border-bottom:1px solid rgba(255,255,255,0.07);")
+    div(style="display:flex; align-items:center; gap:16px;")
+      a(href="/home" style="color:rgba(255,255,255,0.5); font-size:13px; text-decoration:none;") ← Inicio
+      span(style="color:rgba(255,255,255,0.15);") /
+      span(style="color:rgba(255,255,255,0.6); font-size:13px;") Buscador
+    span(style="color:rgba(255,255,255,0.3); font-size:13px;") #{user.username}
+
+  main(style="max-width:760px; margin:0 auto; padding:40px 24px;")
+
+    //- Encabezado
+    div(style="margin-bottom:32px;")
+      h1(style="color:white; font-size:1.8rem; font-weight:900; margin-bottom:6px;") 🔍 Buscar animales
+      p(style="color:rgba(255,255,255,0.35); font-size:0.85rem;") Busca por nombre, especie, dieta, hábitat o comportamiento. Funciona aunque tengas errores de escritura.
+
+    //- Formulario de búsqueda
+    form(method="GET" action="/buscar" style="display:flex; gap:10px; margin-bottom:20px;")
+      input(
+        type="text" name="q"
+        value=query
+        placeholder="Ej: carnívoro, águila, océano, veneno..."
+        class="search-input"
+        autofocus
+      )
+      button(type="submit" class="search-btn") Buscar
+
+    //- Sugerencias rápidas
+    div(style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:36px;")
+      a(href="/buscar?q=carnívoro" class="pill-sugg") 🥩 Carnívoro
+      a(href="/buscar?q=veneno" class="pill-sugg") ☠️ Veneno
+      a(href="/buscar?q=extinto" class="pill-sugg") 💀 Extinto
+      a(href="/buscar?q=océano" class="pill-sugg") 🌊 Océano
+      a(href="/buscar?q=Australia" class="pill-sugg") 🦘 Australia
+      a(href="/buscar?q=en peligro" class="pill-sugg") 🔴 En peligro
+      a(href="/buscar?q=veneno" class="pill-sugg") 🐍 Reptil
+      a(href="/buscar?q=migración" class="pill-sugg") 🦅 Migración
+
+    //- Resultados
+    if sin_query
+      div(style="text-align:center; padding:60px 0; color:rgba(255,255,255,0.25);")
+        div(style="font-size:3rem; margin-bottom:12px;") 🔎
+        p(style="font-size:1rem;") Escribe algo para comenzar a buscar
+
+    else if resultados.length === 0
+      div(style="text-align:center; padding:60px 0;")
+        div(style="font-size:3rem; margin-bottom:12px;") 😕
+        p(style="color:white; font-weight:700; margin-bottom:8px;") Sin resultados para "#{query}"
+        p(style="color:rgba(255,255,255,0.35); font-size:0.85rem;") Intenta con otras palabras, revisa la ortografía o usa los filtros rápidos de arriba.
+
+    else
+      p(style="color:rgba(255,255,255,0.35); font-size:12px; margin-bottom:20px; text-transform:uppercase; letter-spacing:0.08em;")
+        | #{resultados.length} resultado#{resultados.length !== 1 ? 's' : ''} para "#{query}"
+
+      div(style="display:flex; flex-direction:column; gap:12px;")
+        each r, i in resultados
+          a(href=r.url class="result-card" style=`animation-delay:${i * 0.04}s`)
+            if r.animal.imagen
+              img(src=r.animal.imagen alt=r.animal.nombre class="result-img")
+            else
+              div(class="result-img" style="display:flex; align-items:center; justify-content:center; font-size:2rem;")= r.categoria.icon
+
+            div(style="flex:1; min-width:0;")
+              div(class="result-tag")
+                span= r.categoria.icon
+                span= r.categoria.name
+                span(style="color:rgba(74,222,128,0.5);") ·
+                span= r.subtipo.name
+
+              h3(style="color:white; font-weight:800; font-size:1rem; margin:0 0 2px;")= r.animal.nombre
+              p(style="color:rgba(255,255,255,0.4); font-size:12px; font-style:italic; margin:0 0 6px;")= r.animal.nombreCientifico
+
+              div(style="display:flex; flex-wrap:wrap; gap:8px;")
+                if r.animal.alimentacion
+                  span(style="color:rgba(255,255,255,0.45); font-size:11px;") 🍖 #{r.animal.alimentacion.split('—')[0].trim()}
+                if r.animal.conservacion
+                  span(style="color:rgba(255,255,255,0.35); font-size:11px;") 🛡 #{r.animal.conservacion}
+
+            div(style="color:rgba(74,222,128,0.5); font-size:18px; flex-shrink:0; padding-top:4px;") →

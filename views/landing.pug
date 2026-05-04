@@ -90,7 +90,10 @@ block content
     }
     .btn-secondary:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); }
 
-  div(style="min-height:100vh; background: radial-gradient(ellipse at 55% 35%, #0d2e1a 0%, #071018 55%, #030a10 100%); position:relative; overflow:hidden;")
+  div(style=`min-height:100vh; background-image:url('${bgImage}'); background-size:cover; background-position:center; position:relative; overflow:hidden;`)
+
+    //- Overlay oscuro para mantener legibilidad del contenido
+    div(style="position:absolute; inset:0; background: radial-gradient(ellipse at 55% 35%, rgba(13,46,26,0.90) 0%, rgba(7,16,24,0.93) 55%, rgba(3,10,16,0.96) 100%); pointer-events:none; z-index:0;")
 
     //- Fondo decorativo
     div(style="position:absolute; inset:0; pointer-events:none; overflow:hidden;")

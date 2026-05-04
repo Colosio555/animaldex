@@ -1,0 +1,80 @@
+//- ══════════════════════════════════════════════════════════
+//- SECCIÓN: Fondos de pantalla del login
+//- Añade este bloque dentro de tu adminPanel.pug
+//- Recomendado: después de la sección de usuarios
+//- ══════════════════════════════════════════════════════════
+
+section#fondos(style="margin-bottom:48px;")
+  h2(style="color:white; font-size:1.25rem; font-weight:900; margin-bottom:4px;") 🖼️ Fondos del login
+  p(style="color:rgba(255,255,255,0.35); font-size:0.8rem; margin-bottom:24px;") Las imágenes activas se muestran de forma aleatoria al iniciar sesión.
+
+  //- Alertas de estado
+  if query.bgAgregado
+    div(style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.25); color:#86efac; border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13px;") ✅ Fondo agregado correctamente.
+  if query.bgError
+    div(style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.25); color:#fca5a5; border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:13px;") ❌ Error. Asegúrate de ingresar una URL válida que comience con http.
+
+  //- Formulario para agregar nuevo fondo
+  div(style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px; margin-bottom:24px;")
+    p(style="color:rgba(255,255,255,0.5); font-size:11px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; margin-bottom:14px;") Agregar nuevo fondo
+    form(method="POST" action="/admin/backgrounds/agregar" style="display:grid; grid-template-columns:1fr auto; gap:10px; align-items:start;")
+      div
+        input(
+          type="url" name="url" required
+          placeholder="https://ejemplo.com/imagen.jpg"
+          style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:10px; padding:11px 14px; font-size:13px; outline:none;"
+        )
+        input(
+          type="text" name="descripcion"
+          placeholder="Descripción opcional"
+          style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:white; border-radius:10px; padding:9px 14px; font-size:12px; outline:none; margin-top:8px;"
+        )
+      button(
+        type="submit"
+        style="background:#22c55e; color:white; font-weight:700; font-size:12px; border:none; border-radius:10px; padding:11px 18px; cursor:pointer; white-space:nowrap; align-self:start; letter-spacing:0.06em;"
+      ) + Agregar
+
+  //- Lista de fondos actuales
+  if backgrounds && backgrounds.length > 0
+    div(style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:14px;")
+      each bg in backgrounds
+        div(style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:14px; overflow:hidden; position:relative;")
+
+          //- Preview imagen
+          div(style="position:relative; height:130px; overflow:hidden;")
+            img(
+              src=bg.url alt="Fondo"
+              style="width:100%; height:100%; object-fit:cover;"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            )
+            div(style="display:none; position:absolute; inset:0; background:#1a2420; align-items:center; justify-content:center; color:rgba(255,255,255,0.3); font-size:12px;") ⚠️ Error al cargar
+            //- Badge estado
+            div(style="position:absolute; top:8px; right:8px;")
+              if bg.activa
+                span(style="background:rgba(34,197,94,0.85); color:white; font-size:9px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:3px 8px; border-radius:10px;") Activa
+              else
+                span(style="background:rgba(100,100,100,0.85); color:white; font-size:9px; font-weight:800; letter-spacing:0.1em; text-transform:uppercase; padding:3px 8px; border-radius:10px;") Inactiva
+
+          //- Info y acciones
+          div(style="padding:12px;")
+            if bg.descripcion
+              p(style="color:rgba(255,255,255,0.6); font-size:11px; margin-bottom:4px;")= bg.descripcion
+            p(style="color:rgba(255,255,255,0.2); font-size:10px; margin-bottom:10px; word-break:break-all;")= bg.url.length > 45 ? bg.url.slice(0,45) + '…' : bg.url
+            if bg.agregadaPor
+              p(style="color:rgba(255,255,255,0.2); font-size:10px; margin-bottom:10px;") Por: #{bg.agregadaPor.username}
+            div(style="display:flex; gap:6px;")
+              //- Toggle activa/inactiva
+              form(method="POST" action=`/admin/backgrounds/toggle/${bg._id}` style="flex:1;")
+                button(
+                  type="submit"
+                  style=`width:100%; background:${bg.activa ? 'rgba(234,179,8,0.15)' : 'rgba(34,197,94,0.15)'}; color:${bg.activa ? '#facc15' : '#4ade80'}; border:1px solid ${bg.activa ? 'rgba(234,179,8,0.25)' : 'rgba(34,197,94,0.25)'}; border-radius:8px; padding:7px; font-size:11px; font-weight:700; cursor:pointer; letter-spacing:0.05em;`
+                )= bg.activa ? 'Desactivar' : 'Activar'
+              //- Eliminar
+              form(method="POST" action=`/admin/backgrounds/eliminar/${bg._id}` style="flex:1;" onsubmit="return confirm('¿Eliminar este fondo?')")
+                button(
+                  type="submit"
+                  style="width:100%; background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.22); border-radius:8px; padding:7px; font-size:11px; font-weight:700; cursor:pointer; letter-spacing:0.05em;"
+                ) Eliminar
+
+  else
+    p(style="color:rgba(255,255,255,0.25); font-size:13px; text-align:center; padding:24px;") No hay fondos registrados aún. Agrega el primero arriba.

@@ -1,6 +1,7 @@
-const AnimalPropuesto = require('../models/animalPropuestoModel');
-const Publicacion     = require('../models/publicacionModel');
-const Usuario         = require('../models/usuarioModel');
+const AnimalPropuesto   = require('../models/animalPropuestoModel');
+const Publicacion       = require('../models/publicacionModel');
+const Usuario           = require('../models/usuarioModel');
+const LoginBackground   = require('../models/loginBackgroundModel');
 
 const CATEGORIAS = ['mamiferos','aves','reptiles','anfibios','peces','artropodos','moluscos','equinodermos','anelidos'];
 
@@ -50,12 +51,19 @@ exports.proponer = async (req, res) => {
 };
 
 exports.renderAdmin = async (req, res) => {
-  const pendientes = await AnimalPropuesto.find({ estado: 'pendiente' }).populate('propuestoPor', 'username');
-  const historial  = await AnimalPropuesto.find({ estado: { $ne: 'pendiente' } })
+  const pendientes   = await AnimalPropuesto.find({ estado: 'pendiente' }).populate('propuestoPor', 'username');
+  const historial    = await AnimalPropuesto.find({ estado: { $ne: 'pendiente' } })
     .populate('propuestoPor', 'username').populate('revisadoPor', 'username')
     .sort({ updatedAt: -1 }).limit(20);
-  const usuarios = await Usuario.find({}).select('username rol createdAt');
-  res.render('adminPanel', { user: req.session.user, pendientes, historial, usuarios, query: req.query });
+  const usuarios     = await Usuario.find({}).select('username rol createdAt');
+  const backgrounds  = await LoginBackground.find({}).populate('agregadaPor', 'username').sort({ createdAt: -1 });
+
+  res.render('adminPanel', {
+    user: req.session.user,
+    pendientes, historial, usuarios,
+    backgrounds,
+    query: req.query
+  });
 };
 
 exports.aprobar = async (req, res) => {
@@ -114,11 +122,7 @@ exports.toggleLike = async (req, res) => {
     const pub     = await Publicacion.findById(req.params.id);
     if (!pub) return res.redirect('/home');
     const yaLikeo = pub.likes.some(id => id.equals(usuario._id));
-    if (yaLikeo) {
-      pub.likes.pull(usuario._id);
-    } else {
-      pub.likes.push(usuario._id);
-    }
+    if (yaLikeo) { pub.likes.pull(usuario._id); } else { pub.likes.push(usuario._id); }
     await pub.save();
     res.redirect('/home#pub-' + pub._id);
   } catch (err) {
@@ -138,5 +142,40 @@ exports.comentar = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.redirect('/home');
+  }
+};
+
+// ── Gestión de fondos del login ───────────────────────────────
+exports.agregarBackground = async (req, res) => {
+  try {
+    const { url, descripcion } = req.body;
+    if (!url || !url.startsWith('http')) return res.redirect('/admin?bgError=url');
+    const admin = await Usuario.findOne({ username: req.session.user.username });
+    await LoginBackground.create({ url: url.trim(), descripcion: descripcion || '', agregadaPor: admin._id });
+    res.redirect('/admin?bgAgregado=1');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin?bgError=1');
+  }
+};
+
+exports.toggleBackground = async (req, res) => {
+  try {
+    const bg = await LoginBackground.findById(req.params.id);
+    if (bg) { bg.activa = !bg.activa; await bg.save(); }
+    res.redirect('/admin#fondos');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
+  }
+};
+
+exports.eliminarBackground = async (req, res) => {
+  try {
+    await LoginBackground.findByIdAndDelete(req.params.id);
+    res.redirect('/admin#fondos');
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin');
   }
 };
