@@ -1,0 +1,85 @@
+extends ../layout
+
+block content
+  style.
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    .a1{opacity:0;animation:fadeInUp 0.6s ease 0.1s forwards}
+    .a2{opacity:0;animation:fadeInUp 0.6s ease 0.2s forwards}
+    .a3{opacity:0;animation:fadeInUp 0.6s ease 0.3s forwards}
+    .a4{opacity:0;animation:fadeInUp 0.6s ease 0.4s forwards}
+
+  nav(class="flex items-center justify-between px-8 py-4 border-b border-white/10 sticky top-0 z-50 bg-slate-950/95 backdrop-blur")
+    div(class="flex items-center gap-2 text-sm text-white/40")
+      a(href="/home" class="hover:text-white transition-colors") Inicio
+      span /
+      a(href=`/animal/${categoria.id}` class="hover:text-white transition-colors") #{categoria.name}
+      span /
+      a(href=`/animal/${categoria.id}/${subtipo.name.toLowerCase().replace(/ /g,'-')}` class="hover:text-white transition-colors") #{subtipo.name}
+      span /
+      span(class="text-white") #{animal.nombre}
+    a(href="/logout" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-white/60") Salir
+
+  div(class="max-w-5xl mx-auto px-6 py-10")
+
+    div(class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10")
+      div(class="a1 relative rounded-3xl overflow-hidden" style="height:400px;")
+        if animal.imagen
+          img(src=animal.imagen alt=animal.nombre class="w-full h-full object-cover")
+        else
+          div(class="w-full h-full bg-slate-800 flex items-center justify-center text-8xl") #{categoria.icon}
+        div(style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.6),transparent 50%)")
+        if animal.conservacion
+          div(style="position:absolute;top:16px;left:16px;")
+            span(class="text-xs bg-black/50 backdrop-blur border border-white/20 text-white px-3 py-1.5 rounded-full font-bold") #{animal.conservacion}
+
+      div(class="a2 flex flex-col justify-center")
+        p(class="text-white/40 text-xs uppercase tracking-widest mb-2") #{categoria.name} · #{subtipo.name}
+        h1(class="text-4xl font-black text-white mb-1") #{animal.nombre}
+        p(class="text-white/40 italic text-lg mb-6") #{animal.nombreCientifico}
+
+        div(class="grid grid-cols-2 gap-3 mb-6")
+          div(class="bg-white/5 border border-white/10 rounded-2xl p-4")
+            p(class="text-white/30 text-xs uppercase tracking-widest mb-1") Altura / Longitud
+            p(class="text-white font-black text-sm") #{animal.altura}
+          div(class="bg-white/5 border border-white/10 rounded-2xl p-4")
+            p(class="text-white/30 text-xs uppercase tracking-widest mb-1") Peso
+            p(class="text-white font-black text-sm") #{animal.peso}
+          div(class="bg-white/5 border border-white/10 rounded-2xl p-4")
+            p(class="text-white/30 text-xs uppercase tracking-widest mb-1") Edad máxima
+            p(class="text-white font-black text-sm") #{animal.edadMaxima}
+          div(class="bg-white/5 border border-white/10 rounded-2xl p-4")
+            p(class="text-white/30 text-xs uppercase tracking-widest mb-1") Alimentación
+            p(class="text-white font-black text-sm") #{animal.alimentacion}
+
+        div(class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-3")
+          p(class="text-white/30 text-xs uppercase tracking-widest mb-1") Hábitat
+          p(class="text-white text-sm") #{animal.habitat}
+
+    div(class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8")
+      div(class="a3 bg-white/5 border border-white/10 rounded-3xl p-6")
+        h3(class="text-white font-black text-base uppercase tracking-widest mb-3") Comportamiento
+        p(class="text-white/60 text-sm leading-relaxed") #{animal.comportamiento}
+
+      div(class="a3 bg-white/5 border border-white/10 rounded-3xl p-6")
+        h3(class="text-white font-black text-base uppercase tracking-widest mb-3") Datos curiosos
+        if animal.curiosidades && animal.curiosidades.length
+          ul(class="space-y-2")
+            each dato in animal.curiosidades
+              li(class="flex items-start gap-2 text-sm text-white/70")
+                span(class="text-yellow-400 mt-0.5 flex-shrink-0") ★
+                span= dato
+
+    div(class="a4 bg-white/5 border border-white/10 rounded-3xl p-6")
+      h3(class="text-white font-black text-base uppercase tracking-widest mb-4") Clasificación taxonómica
+      div(class="flex flex-wrap gap-3")
+        each key in ['reino','filo','clase','orden','familia']
+          if animal[key]
+            div(class="bg-white/5 border border-white/10 rounded-xl px-4 py-2")
+              p(class="text-white/30 text-xs uppercase") #{key}
+              p(class="text-white font-bold text-sm") #{animal[key]}
+
+    div(class="mt-8 flex gap-4")
+      a(href=`/animal/${categoria.id}/${subtipo.name.toLowerCase().replace(/ /g,'-')}` class="bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-3 rounded-xl transition-colors text-sm") ← Volver a #{subtipo.name}
+      a(href=`/animal/${categoria.id}` class="text-white/30 hover:text-white/60 font-bold px-6 py-3 rounded-xl transition-colors text-sm") Ver todos los #{categoria.name}
+
+  footer(class="text-center py-6 text-white/20 text-xs border-t border-white/5") AnimaliaDex · Explorador de especies

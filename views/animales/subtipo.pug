@@ -1,0 +1,66 @@
+extends ../layout
+
+block content
+  style.
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes scaleIn  { from{opacity:0;transform:scale(0.94)}       to{opacity:1;transform:scale(1)} }
+    .card-animal { opacity:0; animation: scaleIn 0.5s ease forwards; }
+
+  nav(class="flex items-center justify-between px-8 py-4 border-b border-white/10 sticky top-0 z-50 bg-slate-950/95 backdrop-blur")
+    div(class="flex items-center gap-2 text-sm text-white/40")
+      a(href="/home" class="hover:text-white transition-colors") Inicio
+      span /
+      a(href=`/animal/${categoria.id}` class="hover:text-white transition-colors") #{categoria.name}
+      span /
+      span(class="text-white") #{subtipo.name}
+    div(class="flex items-center gap-3")
+      if user && user.rol !== 'invitado'
+        a(href="/panel" class="text-xs bg-green-500/20 border border-green-400/30 text-green-300 px-4 py-2 rounded-full hover:bg-green-500/40 transition-colors") + Proponer
+      a(href="/logout" class="text-xs bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full text-white/60") Salir
+
+  div(class="relative h-64 overflow-hidden")
+    if subtipo.imagen
+      img(src=subtipo.imagen alt=subtipo.name class="w-full h-full object-cover")
+    div(class="absolute inset-0" style="background:linear-gradient(to bottom,rgba(0,0,0,0.3),rgba(15,23,42,1))")
+    div(class="absolute bottom-0 left-0 right-0 px-8 pb-8" style="animation:fadeInUp 0.6s ease forwards")
+      p(class="text-white/50 text-xs uppercase tracking-widest mb-1") #{categoria.name}
+      h1(class="text-4xl font-black text-white mb-2") #{subtipo.name}
+      p(class="text-white/55 text-sm max-w-2xl leading-relaxed") #{subtipo.descripcion || ''}
+
+  main(class="max-w-6xl mx-auto px-6 py-12")
+    h2(class="text-xl font-black text-white mb-2 uppercase tracking-widest") Animales documentados
+    p(class="text-white/30 text-sm mb-8") Selecciona un animal para ver su ficha completa
+
+    if subtipo.animales && subtipo.animales.length
+      div(class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6")
+        each animal, i in subtipo.animales
+          a(href=`/animal/${categoria.id}/${subtipo.name.toLowerCase().replace(/ /g,'-')}/${i}` class="card-animal group block rounded-3xl overflow-hidden border border-white/10 hover:border-white/30 transition-all duration-300 hover:-translate-y-2" style=`animation-delay:${i*0.1}s`)
+            div(style="position:relative; height:220px; overflow:hidden;")
+              if animal.imagen
+                img(src=animal.imagen alt=animal.nombre class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700")
+              else
+                div(class="w-full h-full bg-slate-800 flex items-center justify-center text-6xl") #{categoria.icon}
+              div(style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,0.95))")
+              div(style="position:absolute;top:12px;right:12px;")
+                span(class="text-xs bg-black/40 backdrop-blur border border-white/20 text-white/70 px-2 py-1 rounded-full") #{animal.conservacion ? animal.conservacion.split(' ')[0] : ''}
+              div(style="position:absolute;bottom:0;left:0;right:0;padding:16px;")
+                p(class="text-white font-black text-lg leading-tight") #{animal.nombre}
+                p(class="text-white/40 italic text-xs mt-0.5") #{animal.nombreCientifico}
+            div(class="bg-slate-900 px-5 py-4")
+              div(class="grid grid-cols-2 gap-2 mb-3")
+                div(class="bg-white/5 rounded-xl p-2 text-center")
+                  p(class="text-white/30 text-xs") Peso
+                  p(class="text-white text-xs font-bold truncate") #{animal.peso}
+                div(class="bg-white/5 rounded-xl p-2 text-center")
+                  p(class="text-white/30 text-xs") Hábitat
+                  p(class="text-white text-xs font-bold truncate") #{animal.habitat ? animal.habitat.split(',')[0] : ''}
+              div(class="flex items-center gap-2 text-green-400 text-xs font-bold group-hover:gap-3 transition-all")
+                span Ver ficha completa
+                span →
+    else
+      div(class="text-center py-20 text-white/20")
+        p(class="text-5xl mb-4") 🔬
+        p(class="font-black text-lg") Próximamente
+        p(class="text-sm mt-2") Aún no hay animales documentados en este subgrupo.
+
+  footer(class="text-center py-6 text-white/20 text-xs border-t border-white/5") AnimaliaDex · Explorador de especies
