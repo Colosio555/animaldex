@@ -1,0 +1,201 @@
+extends layout
+
+block content
+  style.
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade { opacity: 0; animation: fadeUp 0.5s ease forwards; }
+    .section-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 16px;
+    }
+    .info-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row:hover .row-text { color: #4ade80; }
+    .info-row:hover .row-arrow { opacity: 1; }
+    .row-text {
+      color: rgba(255,255,255,0.75);
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.15s;
+    }
+    .row-arrow {
+      color: rgba(255,255,255,0.25);
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .img-thumb {
+      width: 100%;
+      height: 110px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.07);
+      transition: transform 0.3s, border-color 0.2s;
+    }
+    .img-thumb:hover {
+      transform: scale(1.03);
+      border-color: rgba(74,222,128,0.3);
+    }
+    .tag {
+      display: inline-block;
+      background: rgba(74,222,128,0.1);
+      border: 1px solid rgba(74,222,128,0.2);
+      color: #4ade80;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+    }
+
+  //- Nav
+  nav(style="display:flex; align-items:center; justify-content:space-between; padding:16px 32px; border-bottom:1px solid rgba(255,255,255,0.07); background:rgba(2,8,14,0.95); backdrop-filter:blur(12px); position:sticky; top:0; z-index:50;")
+    div(style="display:flex; align-items:center; gap:16px;")
+      span(style="font-size:1.4rem;") 🌿
+      a(href="/home" style="color:white; font-size:1.1rem; font-weight:900; text-decoration:none; letter-spacing:-0.01em;") AnimaliaDex
+    div(style="display:flex; align-items:center; gap:24px;")
+      a(href="/home" style="color:rgba(255,255,255,0.5); font-size:13px; text-decoration:none;") Explorar
+      a(href="/buscar" style="color:rgba(255,255,255,0.5); font-size:13px; text-decoration:none;") 🔍 Buscar
+      a(href="/acercade" style="color:#4ade80; font-size:13px; font-weight:700; text-decoration:none;") Acerca de
+    div(style="display:flex; align-items:center; gap:10px;")
+      span(style="color:rgba(255,255,255,0.3); font-size:13px;") #{user.username}
+      a(href="/logout" style="color:rgba(255,255,255,0.4); font-size:12px; text-decoration:none; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); padding:6px 14px; border-radius:20px;") Salir
+
+  main(style="max-width:900px; margin:0 auto; padding:48px 24px;")
+
+    //- Encabezado
+    div(class="fade" style="animation-delay:0s; margin-bottom:40px;")
+      div(style="display:inline-flex; align-items:center; gap:8px; background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.18); padding:6px 16px; border-radius:20px; margin-bottom:18px;")
+        span(style="width:6px; height:6px; border-radius:50%; background:#4ade80; display:inline-block;")
+        span(style="color:#4ade80; font-size:10px; font-weight:800; letter-spacing:0.14em; text-transform:uppercase;") BioNexus Labs S.A. de C.V.
+      h1(style="color:white; font-size:2.2rem; font-weight:900; margin-bottom:8px; line-height:1.1;") Acerca de AnimaliaDex
+      p(style="color:rgba(255,255,255,0.35); font-size:0.95rem; max-width:520px; line-height:1.7;") Plataforma educativa colaborativa para el estudio del reino animal. Creada con pasión por la biología y la tecnología.
+
+    div(style="display:grid; grid-template-columns:1fr 340px; gap:20px; align-items:start;")
+
+      //- Columna principal
+      div
+
+        //- Quiénes somos
+        div(class="section-card fade" style="animation-delay:0.1s;")
+          p(class="section-label") Quiénes somos
+          div(style="display:flex; align-items:center; gap:14px; margin-bottom:16px;")
+            div(style="width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg,#16a34a,#059669); display:flex; align-items:center; justify-content:center; font-size:1.6rem; flex-shrink:0;") 🌿
+            div
+              h2(style="color:white; font-size:1.1rem; font-weight:800; margin:0 0 2px;") BioNexus Labs
+              p(style="color:rgba(255,255,255,0.3); font-size:12px; margin:0;") S.A. de C.V. · Ciudad de México, México
+          p(style="color:rgba(255,255,255,0.5); font-size:13px; line-height:1.8;")
+            | Somos una empresa de tecnología educativa fundada en 2024, especializada en democratizar el acceso al conocimiento científico sobre biodiversidad. AnimaliaDex nació como proyecto universitario y creció hasta convertirse en una plataforma colaborativa donde estudiantes, biólogos y entusiastas del reino animal comparten y amplían el conocimiento colectivo.
+          div(style="margin-top:16px;")
+            span(class="tag") 🔬 Ciencia abierta
+            span(class="tag") 🌍 Biodiversidad
+            span(class="tag") 📚 Educación
+            span(class="tag") 🤝 Colaborativo
+
+        //- Explorar
+        div(class="section-card fade" style="animation-delay:0.15s;")
+          p(class="section-label") Explorar la plataforma
+          a(href="/home" class="info-row")
+            span(class="row-text") 🏠 Inicio — catálogo principal
+            span(class="row-arrow") ↗
+          a(href="/buscar" class="info-row")
+            span(class="row-text") 🔍 Buscador de especies
+            span(class="row-arrow") ↗
+          a(href="/panel" class="info-row")
+            span(class="row-text") ➕ Proponer un animal nuevo
+            span(class="row-arrow") ↗
+          if user && user.rol === 'admin'
+            a(href="/admin" class="info-row")
+              span(class="row-text") ⚙️ Panel de administración
+              span(class="row-arrow") ↗
+
+        //- Galería de fondos
+        div(class="section-card fade" style="animation-delay:0.2s;")
+          p(class="section-label") Galería de fondos del explorador
+          p(style="color:rgba(255,255,255,0.3); font-size:12px; margin-bottom:16px;") Imágenes de fondo usadas en la plataforma. Los administradores pueden agregar más desde el panel.
+          div(style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px;")
+            a(href="https://i1-e.pinimg.com/1200x/44/18/65/44186532b4c6e80c74c8a9bdc1960404.jpg" target="_blank")
+              img(src="https://i1-e.pinimg.com/1200x/44/18/65/44186532b4c6e80c74c8a9bdc1960404.jpg" class="img-thumb" alt="Fondo 1")
+            a(href="https://i1-e.pinimg.com/1200x/9f/0a/a3/9f0aa3d7ca3000b16caa776ac1efa7c5.jpg" target="_blank")
+              img(src="https://i1-e.pinimg.com/1200x/9f/0a/a3/9f0aa3d7ca3000b16caa776ac1efa7c5.jpg" class="img-thumb" alt="Fondo 2")
+            a(href="https://i1-e.pinimg.com/736x/fc/87/27/fc8727407d28daebe9c9a0cd22082ceb.jpg" target="_blank")
+              img(src="https://i1-e.pinimg.com/736x/fc/87/27/fc8727407d28daebe9c9a0cd22082ceb.jpg" class="img-thumb" alt="Fondo 3")
+            a(href="https://i1-e.pinimg.com/1200x/b3/88/44/b38844f9d70247b6b11af961adebfcc5.jpg" target="_blank")
+              img(src="https://i1-e.pinimg.com/1200x/b3/88/44/b38844f9d70247b6b11af961adebfcc5.jpg" class="img-thumb" alt="Fondo 4")
+            a(href="https://i.pinimg.com/736x/c7/70/f2/c770f25411fdd5083c6a110f3526f3f2.jpg" target="_blank")
+              img(src="https://i.pinimg.com/736x/c7/70/f2/c770f25411fdd5083c6a110f3526f3f2.jpg" class="img-thumb" alt="Fondo 5")
+            a(href="https://i1-e.pinimg.com/1200x/7d/6c/6c/7d6c6c6ce5378d5f4a08ebd0fa505972.jpg" target="_blank")
+              img(src="https://i1-e.pinimg.com/1200x/7d/6c/6c/7d6c6c6ce5378d5f4a08ebd0fa505972.jpg" class="img-thumb" alt="Fondo 6")
+
+      //- Columna lateral
+      div
+
+        //- Contacto
+        div(class="section-card fade" style="animation-delay:0.25s;")
+          p(class="section-label") Contacto y soporte
+          div(style="margin-bottom:16px;")
+            p(style="color:rgba(255,255,255,0.4); font-size:11px; margin-bottom:6px;") Correo de contacto
+            a(href="mailto:contacto@bionexuslabs.mx" style="color:#4ade80; font-size:14px; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:6px;")
+              span 📧
+              span contacto@bionexuslabs.mx
+          div(style="background:rgba(74,222,128,0.06); border:1px solid rgba(74,222,128,0.15); border-radius:12px; padding:14px;")
+            p(style="color:rgba(255,255,255,0.4); font-size:11px; line-height:1.6; margin:0;") ¿Encontraste un error, tienes una sugerencia o quieres contribuir con información científica? Escríbenos y te respondemos en menos de 48 horas.
+
+        //- Soporte
+        div(class="section-card fade" style="animation-delay:0.3s;")
+          p(class="section-label") Soporte
+          a(href="mailto:contacto@bionexuslabs.mx" class="info-row")
+            span(class="row-text") Centro de ayuda
+            span(class="row-arrow") ↗
+          a(href="mailto:reportar@bionexuslabs.mx" class="info-row")
+            span(class="row-text") Reportar un error
+            span(class="row-arrow") ↗
+          a(href="/panel" class="info-row")
+            span(class="row-text") Proponer una especie
+            span(class="row-arrow") ↗
+
+        //- Legal
+        div(class="section-card fade" style="animation-delay:0.35s;")
+          p(class="section-label") Legal
+          div(class="info-row" style="cursor:default;")
+            span(class="row-text") Política de privacidad
+          div(class="info-row" style="cursor:default;")
+            span(class="row-text") Términos de uso
+          div(class="info-row" style="cursor:default;")
+            span(class="row-text") Licencias de contenido
+          div(style="margin-top:14px; padding:12px; background:rgba(255,255,255,0.02); border-radius:10px;")
+            p(style="color:rgba(255,255,255,0.2); font-size:11px; line-height:1.6; margin:0;")
+              | Las fichas científicas son de carácter educativo. Las imágenes provienen de fuentes abiertas (Unsplash, Pinterest). AnimaliaDex no tiene fines comerciales.
+
+        //- Versión
+        div(class="fade" style="animation-delay:0.4s; text-align:center; padding:20px 0;")
+          p(style="color:rgba(255,255,255,0.15); font-size:11px; margin-bottom:4px;") AnimaliaDex v1.0.0 · BioNexus Labs S.A. de C.V.
+          p(style="color:rgba(255,255,255,0.1); font-size:10px;") Ciudad de México · #{new Date().getFullYear()}
+
+  footer(style="text-align:center; padding:24px; color:rgba(255,255,255,0.15); font-size:11px; border-top:1px solid rgba(255,255,255,0.05); margin-top:20px;")
+    | AnimaliaDex · BioNexus Labs S.A. de C.V. · Todos los derechos reservados #{new Date().getFullYear()}

@@ -22,6 +22,8 @@ router.get('/invitado',  (req, res) => {
 
 // ── Vistas principales ────────────────────────────────────────
 router.get('/home',                           auth, controlador.renderHome);
+router.get('/explorar',                       auth, controlador.renderExplorar);
+router.get('/acercade',                       auth, (req, res) => res.render('acercade', { user: req.session.user }));
 router.get('/animal/:id',                     auth, controlador.renderCategoria);
 router.get('/animal/:id/:subtipo',            auth, controlador.renderSubtipo);
 router.get('/animal/:id/:subtipo/:animalIdx', auth, controlador.renderAnimal);

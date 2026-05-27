@@ -20,14 +20,34 @@ exports.renderHome = async (req, res) => {
   });
 };
 
-// Nivel 2: página de categoría con sus subtipos
+exports.renderExplorar = (req, res) => {
+  const todas = AnimalModel.getAll();
+  const lista = [];
+  for (const [catKey, categoria] of Object.entries(todas)) {
+    for (const subtipo of (categoria.subtypes || [])) {
+      for (let idx = 0; idx < (subtipo.animales || []).length; idx++) {
+        lista.push({
+          animal:    subtipo.animales[idx],
+          categoria: { id: catKey, name: categoria.name, icon: categoria.icon },
+          subtipo:   { name: subtipo.name },
+          url: `/animal/${catKey}/${subtipo.name.toLowerCase().replace(/\s+/g, '-')}/${idx}`
+        });
+      }
+    }
+  }
+  for (let i = lista.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [lista[i], lista[j]] = [lista[j], lista[i]];
+  }
+  res.render('explorar', { user: req.session.user, animales: lista });
+};
+
 exports.renderCategoria = (req, res) => {
   const categoria = AnimalModel.getById(req.params.id);
   if (!categoria) return res.redirect('/home');
   res.render('animales/categoria', { user: req.session.user, categoria });
 };
 
-// Nivel 3: página de subtipo con sus animales
 exports.renderSubtipo = (req, res) => {
   const categoria = AnimalModel.getById(req.params.id);
   if (!categoria) return res.redirect('/home');
@@ -38,7 +58,6 @@ exports.renderSubtipo = (req, res) => {
   res.render('animales/subtipo', { user: req.session.user, categoria, subtipo });
 };
 
-// Nivel 4: ficha individual de animal
 exports.renderAnimal = (req, res) => {
   const categoria = AnimalModel.getById(req.params.id);
   if (!categoria) return res.redirect('/home');
