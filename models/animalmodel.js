@@ -3,6 +3,8 @@
  * Base de conocimientos AnimaliaDex — versión expandida ~120 animales
  */
 
+const AnimalEdit = require('./animalEditModel');
+
 const categoriesData = {
 
   mamiferos: {
@@ -374,12 +376,81 @@ const categoriesData = {
   }
 };
 
+function slugSubtype(name) {
+  return String(name || '').toLowerCase().replace(/\s+/g, '-');
+}
+
+function getAnimalKey(categoriaId, subtipoSlug, animalIdx) {
+  return `${categoriaId}:${subtipoSlug}:${animalIdx}`;
+}
+
+function cloneCategoriesData() {
+  return JSON.parse(JSON.stringify(categoriesData));
+}
+
+function applyEdits(catalog, edits = []) {
+  const editMap = new Map(edits.map(edit => [edit.animalKey, edit.campos || {}]));
+
+  for (const [catKey, categoria] of Object.entries(catalog)) {
+    for (const subtipo of (categoria.subtypes || [])) {
+      const subtipoSlug = slugSubtype(subtipo.name);
+      for (let idx = 0; idx < (subtipo.animales || []).length; idx++) {
+        const key = getAnimalKey(catKey, subtipoSlug, idx);
+        const campos = editMap.get(key);
+        if (!campos) continue;
+
+        for (const [field, value] of Object.entries(campos)) {
+          if (value !== undefined && value !== null) {
+            subtipo.animales[idx][field] = value;
+          }
+        }
+      }
+    }
+  }
+
+  return catalog;
+}
+
+async function getAllWithEdits() {
+  const edits = await AnimalEdit.find({}).lean();
+  return applyEdits(cloneCategoriesData(), edits);
+}
+
+function listAnimals(catalog = categoriesData) {
+  const lista = [];
+
+  for (const [catKey, categoria] of Object.entries(catalog)) {
+    for (const subtipo of (categoria.subtypes || [])) {
+      const subtipoSlug = slugSubtype(subtipo.name);
+      for (let idx = 0; idx < (subtipo.animales || []).length; idx++) {
+        lista.push({
+          key: getAnimalKey(catKey, subtipoSlug, idx),
+          categoria: { id: catKey, name: categoria.name, icon: categoria.icon },
+          subtipo: { name: subtipo.name, slug: subtipoSlug },
+          animalIdx: idx,
+          animal: subtipo.animales[idx]
+        });
+      }
+    }
+  }
+
+  return lista;
+}
+
 module.exports = {
   getAll: () => categoriesData,
+  getAllWithEdits,
   getById: (id) => categoriesData[id],
+  getByIdWithEdits: async (id) => {
+    const catalog = await getAllWithEdits();
+    return catalog[id];
+  },
   getSubtype: (categoriaId, subtypeName) => {
     const cat = categoriesData[categoriaId];
     if (!cat) return null;
     return cat.subtypes.find(s => s.name.toLowerCase() === subtypeName.toLowerCase());
-  }
+  },
+  slugSubtype,
+  getAnimalKey,
+  listAnimals
 };

@@ -83,7 +83,7 @@ function scoreAnimal(animal, categoria, subtipo, queryNorm, queryWords) {
 }
 
 // ── Controlador principal ─────────────────────────────────────
-exports.buscar = (req, res) => {
+exports.buscar = async (req, res) => {
   const q = (req.query.q || '').trim();
 
   if (!q) {
@@ -97,7 +97,7 @@ exports.buscar = (req, res) => {
 
   const queryNorm  = normalize(q);
   const queryWords = queryNorm.split(' ').filter(w => w.length >= 2);
-  const todas      = AnimalModel.getAll();
+  const todas      = await AnimalModel.getAllWithEdits();
   const resultados = [];
 
   for (const [catKey, categoria] of Object.entries(todas)) {

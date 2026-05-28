@@ -5,7 +5,7 @@ const VERTEBRATES   = ['mamiferos','aves','reptiles','anfibios','peces'];
 const INVERTEBRATES = ['artropodos','moluscos','equinodermos','anelidos'];
 
 exports.renderHome = async (req, res) => {
-  const todos = AnimalModel.getAll();
+  const todos = await AnimalModel.getAllWithEdits();
   const hoyInicio = new Date(); hoyInicio.setHours(0,0,0,0);
   const hoyFin    = new Date(); hoyFin.setHours(23,59,59,999);
   const feed = await Publicacion.find({ createdAt: { $gte: hoyInicio, $lte: hoyFin } })
@@ -20,8 +20,8 @@ exports.renderHome = async (req, res) => {
   });
 };
 
-exports.renderExplorar = (req, res) => {
-  const todas = AnimalModel.getAll();
+exports.renderExplorar = async (req, res) => {
+  const todas = await AnimalModel.getAllWithEdits();
   const lista = [];
   for (const [catKey, categoria] of Object.entries(todas)) {
     for (const subtipo of (categoria.subtypes || [])) {
@@ -42,14 +42,14 @@ exports.renderExplorar = (req, res) => {
   res.render('explorar', { user: req.session.user, animales: lista });
 };
 
-exports.renderCategoria = (req, res) => {
-  const categoria = AnimalModel.getById(req.params.id);
+exports.renderCategoria = async (req, res) => {
+  const categoria = await AnimalModel.getByIdWithEdits(req.params.id);
   if (!categoria) return res.redirect('/home');
   res.render('animales/categoria', { user: req.session.user, categoria });
 };
 
-exports.renderSubtipo = (req, res) => {
-  const categoria = AnimalModel.getById(req.params.id);
+exports.renderSubtipo = async (req, res) => {
+  const categoria = await AnimalModel.getByIdWithEdits(req.params.id);
   if (!categoria) return res.redirect('/home');
   const subtipo = categoria.subtypes.find(
     s => s.name.toLowerCase().replace(/\s+/g,'-') === req.params.subtipo
@@ -58,8 +58,8 @@ exports.renderSubtipo = (req, res) => {
   res.render('animales/subtipo', { user: req.session.user, categoria, subtipo });
 };
 
-exports.renderAnimal = (req, res) => {
-  const categoria = AnimalModel.getById(req.params.id);
+exports.renderAnimal = async (req, res) => {
+  const categoria = await AnimalModel.getByIdWithEdits(req.params.id);
   if (!categoria) return res.redirect('/home');
   const subtipo = categoria.subtypes.find(
     s => s.name.toLowerCase().replace(/\s+/g,'-') === req.params.subtipo
@@ -70,8 +70,8 @@ exports.renderAnimal = (req, res) => {
   res.render('animales/fichaAnimal', { user: req.session.user, categoria, subtipo, animal });
 };
 
-exports.renderDetalle = (req, res) => {
-  const animal = AnimalModel.getById(req.params.id);
+exports.renderDetalle = async (req, res) => {
+  const animal = await AnimalModel.getByIdWithEdits(req.params.id);
   if (!animal) return res.redirect('/home');
   res.render('animales/detalleview', { user: req.session.user, category: animal });
 };

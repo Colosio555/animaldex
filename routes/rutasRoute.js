@@ -45,6 +45,7 @@ router.get('/admin',               auth, soloAdmin, panelCtrl.renderAdmin);
 router.post('/admin/aprobar/:id',  auth, soloAdmin, express.urlencoded({ extended: false }), panelCtrl.aprobar);
 router.post('/admin/rechazar/:id', auth, soloAdmin, express.urlencoded({ extended: false }), panelCtrl.rechazar);
 router.post('/admin/usuarios',     auth, soloAdmin, express.urlencoded({ extended: false }), panelCtrl.crearUsuario);
+router.post('/admin/animales/actualizar', auth, soloAdmin, upload.single('imagenArchivo'), panelCtrl.actualizarAnimal);
 
 // ── Gestión de fondos del login (solo admin) ──────────────────
 router.post('/admin/backgrounds/agregar',      auth, soloAdmin, express.urlencoded({ extended: false }), panelCtrl.agregarBackground);

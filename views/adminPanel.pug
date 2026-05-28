@@ -1,6 +1,10 @@
 extends layout
 
 block content
+  style.
+    details.animal-edit > summary::-webkit-details-marker { display: none; }
+    details.animal-edit[open] > summary { border-bottom: 1px solid rgba(255,255,255,0.08); }
+
   nav(class="flex items-center justify-between px-8 py-4 border-b border-white/10")
     div(class="flex items-center gap-4")
       a(href="/home" class="text-white/60 hover:text-white text-sm") ← Inicio
@@ -50,6 +54,147 @@ block content
                     p(class="font-bold text-white") #{a.conservacion}
               if a.curiosidades && a.curiosidades.length
                 p(class="mt-3 text-xs text-white/40") #{a.curiosidades.join(' · ')}
+
+    section#catalogo
+      -
+        var animalSeleccionado = catalogoEditable && query && query.animal
+          ? catalogoEditable.find(item => item.key === query.animal)
+          : null
+        var animalSeleccionadoLabel = animalSeleccionado
+          ? `${animalSeleccionado.animal.nombre} — ${animalSeleccionado.categoria.name} / ${animalSeleccionado.subtipo.name}`
+          : ''
+      div(class="flex items-end justify-between gap-4 flex-wrap mb-6")
+        div
+          h2(class="text-3xl font-black mb-2 text-white") Editar catálogo
+          p(class="text-white/35 text-sm") Corrige imágenes y datos de los animales publicados.
+        span(class="text-xs bg-green-500/15 border border-green-400/25 text-green-300 px-3 py-1 rounded-full") #{catalogoEditable ? catalogoEditable.length : 0} animales
+
+      if query && query.animalActualizado
+        p(class="text-green-400 text-sm mb-4") ✅ Animal actualizado correctamente.
+      if query && query.animalError
+        p(class="text-red-400 text-sm mb-4") ❌ No se pudo actualizar el animal. Revisa los datos e intenta de nuevo.
+
+      div(class="bg-white/5 border border-white/10 rounded-2xl p-4 mb-5")
+        label(for="buscadorAnimalesAdmin" class="block text-white/40 text-xs uppercase tracking-widest mb-2") Animal a modificar
+        div(class="relative")
+          input(
+            id="buscadorAnimalesAdmin"
+            type="search"
+            value=animalSeleccionadoLabel
+            placeholder="Escribe el nombre del animal..."
+            autocomplete="off"
+            class="w-full bg-black/20 border border-white/10 text-white placeholder-white/25 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-green-400"
+            oninput="buscarAnimalesAdmin(this.value)"
+            onfocus="buscarAnimalesAdmin(this.value)"
+          )
+          div(id="sugerenciasAnimalesAdmin" class="hidden absolute left-0 right-0 top-full mt-2 z-20 bg-slate-950 border border-white/10 rounded-xl shadow-2xl shadow-black/40 overflow-hidden max-h-72 overflow-y-auto")
+            if catalogoEditable
+              each item in catalogoEditable
+                - var label = `${item.animal.nombre} — ${item.categoria.name} / ${item.subtipo.name}`
+                - var searchText = [item.animal.nombre, item.animal.nombreCientifico, item.categoria.name, item.subtipo.name].join(' ').toLowerCase()
+                button(
+                  type="button"
+                  class="animal-suggestion hidden w-full text-left px-4 py-3 text-sm hover:bg-white/10 transition-colors border-b border-white/5 last:border-b-0"
+                  data-animal-key=item.key
+                  data-label=label
+                  data-search=searchText
+                  onclick="seleccionarAnimalAdmin(this.dataset.animalKey, this.dataset.label)"
+                )
+                  span(class="block font-bold text-white") #{item.animal.nombre}
+                  span(class="block text-xs text-white/35 mt-0.5") #{item.categoria.name} / #{item.subtipo.name} · #{item.animal.nombreCientifico}
+          p(id="ayudaBuscadorAnimales" class="mt-2 text-xs text-white/30") Escribe para buscar y selecciona una sugerencia.
+
+      if !catalogoEditable || catalogoEditable.length === 0
+        p(class="text-white/30 italic text-sm") No hay animales cargados en el catálogo.
+      else
+        div(id="seleccionVacia" class=`bg-white/5 border border-white/10 rounded-2xl p-8 text-center text-white/35 text-sm ${query && query.animal ? 'hidden' : ''}`)
+          p(class="font-bold text-white/55 mb-1") Ningún animal seleccionado
+          p Usa el desplegable para abrir solo la ficha que quieras corregir.
+        div(id="listaAnimalesAdmin" class="space-y-3")
+          each item in catalogoEditable
+            - var abierto = query && query.animal === item.key
+            details(class=`animal-edit bg-white/5 border ${abierto ? 'border-green-400/40' : 'border-white/10'} rounded-2xl overflow-hidden ${abierto ? '' : 'hidden'}` data-animal-key=item.key open=abierto)
+              summary(class="p-4 cursor-pointer flex items-center justify-between gap-4")
+                div(class="flex items-center gap-4 min-w-0")
+                  if item.animal.imagen
+                    img(src=item.animal.imagen alt=item.animal.nombre class="w-16 h-16 rounded-xl object-cover bg-white/5 border border-white/10 flex-shrink-0")
+                  else
+                    div(class="w-16 h-16 rounded-xl bg-white/10 border border-white/10 flex items-center justify-center text-2xl flex-shrink-0") #{item.categoria.icon}
+                  div(class="min-w-0")
+                    h3(class="font-black text-white text-sm truncate") #{item.animal.nombre}
+                    p(class="text-white/35 text-xs italic truncate") #{item.animal.nombreCientifico}
+                    p(class="text-white/25 text-xs mt-1") #{item.categoria.name} · #{item.subtipo.name}
+                span(class="text-green-300 text-xs bg-green-500/10 border border-green-400/20 px-3 py-1 rounded-full flex-shrink-0") Editar
+
+              form(method="POST" action="/admin/animales/actualizar" enctype="multipart/form-data" class="p-5")
+                input(type="hidden" name="categoriaId" value=item.categoria.id)
+                input(type="hidden" name="subtipoSlug" value=item.subtipo.slug)
+                input(type="hidden" name="animalIdx" value=item.animalIdx)
+
+                div(class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-5")
+                  div
+                    if item.animal.imagen
+                      img(src=item.animal.imagen alt=item.animal.nombre class="w-full aspect-square rounded-2xl object-cover bg-white/5 border border-white/10 mb-3")
+                    else
+                      div(class="w-full aspect-square rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-4xl mb-3") #{item.categoria.icon}
+                    label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") URL de imagen
+                    input(type="url" name="imagen" value=item.animal.imagen placeholder="https://..." class="w-full bg-black/20 border border-white/10 text-white placeholder-white/20 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-green-400 mb-3")
+                    label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Subir imagen
+                    input(type="file" name="imagenArchivo" accept="image/*" class="w-full text-xs text-white/45 file:mr-3 file:rounded-lg file:border-0 file:bg-green-500 file:px-3 file:py-2 file:text-xs file:font-bold file:text-white")
+
+                  div(class="space-y-4")
+                    div(class="grid grid-cols-1 md:grid-cols-2 gap-4")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Nombre
+                        input(type="text" name="nombre" required value=item.animal.nombre class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Nombre científico
+                        input(type="text" name="nombreCientifico" required value=item.animal.nombreCientifico class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Altura
+                        input(type="text" name="altura" value=item.animal.altura class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Peso
+                        input(type="text" name="peso" value=item.animal.peso class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Edad máxima
+                        input(type="text" name="edadMaxima" value=item.animal.edadMaxima class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Conservación
+                        input(type="text" name="conservacion" value=item.animal.conservacion class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+
+                    div
+                      label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Hábitat
+                      input(type="text" name="habitat" value=item.animal.habitat class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                    div
+                      label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Alimentación
+                      input(type="text" name="alimentacion" value=item.animal.alimentacion class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                    div
+                      label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Comportamiento
+                      textarea(name="comportamiento" rows="2" class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400 resize-none")= item.animal.comportamiento || ''
+                    div
+                      label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Curiosidades
+                      textarea(name="curiosidades" rows="3" class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400 resize-none")= (item.animal.curiosidades || []).join('\n')
+
+                    div(class="grid grid-cols-1 md:grid-cols-5 gap-4")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Reino
+                        input(type="text" name="reino" value=item.animal.reino class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Filo
+                        input(type="text" name="filo" value=item.animal.filo class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Clase
+                        input(type="text" name="clase" value=item.animal.clase class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Orden
+                        input(type="text" name="orden" value=item.animal.orden class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+                      div
+                        label(class="block text-white/40 text-xs uppercase tracking-widest mb-2") Familia
+                        input(type="text" name="familia" value=item.animal.familia class="w-full bg-black/20 border border-white/10 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-green-400")
+
+                    div(class="flex justify-end")
+                      button(type="submit" class="bg-green-500 hover:bg-green-400 text-white font-bold py-3 px-6 rounded-xl transition-colors text-sm uppercase tracking-wide") Guardar cambios
 
     section
       h2(class="text-3xl font-black mb-6 text-white") Crear usuario
@@ -104,5 +249,55 @@ block content
                 span(class="text-white/30 text-xs ml-3") #{a.categoria} · #{a.propuestoPor ? a.propuestoPor.username : '?'}
               - var estadoClass = a.estado === 'aprobado' ? 'bg-green-500/20 border-green-400/30 text-green-300' : 'bg-red-500/20 border-red-400/30 text-red-300'
               span(class=`text-xs px-3 py-1 rounded-full border ${estadoClass}`) #{a.estado}
+
+  script.
+    function mostrarAnimal(key) {
+      document.querySelectorAll('.animal-edit').forEach((item) => {
+        const activo = item.dataset.animalKey === key;
+        item.classList.toggle('hidden', !activo);
+        item.open = activo;
+      });
+
+      const vacio = document.getElementById('seleccionVacia');
+      if (vacio) vacio.classList.toggle('hidden', Boolean(key));
+      if (key) window.location.hash = 'catalogo';
+    }
+
+    function buscarAnimalesAdmin(valor) {
+      const query = (valor || '').toLowerCase().trim();
+      const panel = document.getElementById('sugerenciasAnimalesAdmin');
+      const ayuda = document.getElementById('ayudaBuscadorAnimales');
+      const sugerencias = Array.from(document.querySelectorAll('.animal-suggestion'));
+      let visibles = 0;
+
+      sugerencias.forEach((item) => {
+        const coincide = query.length > 0 && (item.dataset.search || '').includes(query);
+        const mostrar = coincide && visibles < 8;
+        item.classList.toggle('hidden', !mostrar);
+        if (mostrar) visibles++;
+      });
+
+      if (panel) panel.classList.toggle('hidden', visibles === 0);
+      if (ayuda) ayuda.textContent = query && visibles === 0
+        ? 'No encontré coincidencias con ese texto.'
+        : 'Escribe para buscar y selecciona una sugerencia.';
+    }
+
+    function seleccionarAnimalAdmin(key, label) {
+      const input = document.getElementById('buscadorAnimalesAdmin');
+      const panel = document.getElementById('sugerenciasAnimalesAdmin');
+      if (input) input.value = label;
+      if (panel) panel.classList.add('hidden');
+      mostrarAnimal(key);
+    }
+
+    document.addEventListener('click', (event) => {
+      const input = document.getElementById('buscadorAnimalesAdmin');
+      const panel = document.getElementById('sugerenciasAnimalesAdmin');
+      if (!input || !panel) return;
+      if (!input.contains(event.target) && !panel.contains(event.target)) {
+        panel.classList.add('hidden');
+      }
+    });
 
   footer(class="text-center py-6 text-white/20 text-xs border-t border-white/5") AnimaliaDex · Panel de administración

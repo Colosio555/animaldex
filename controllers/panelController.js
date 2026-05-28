@@ -2,6 +2,8 @@ const AnimalPropuesto   = require('../models/animalPropuestoModel');
 const Publicacion       = require('../models/publicacionModel');
 const Usuario           = require('../models/usuarioModel');
 const LoginBackground   = require('../models/loginBackgroundModel');
+const AnimalModel       = require('../models/animalmodel');
+const AnimalEdit        = require('../models/animalEditModel');
 
 const CATEGORIAS = ['mamiferos','aves','reptiles','anfibios','peces','artropodos','moluscos','equinodermos','anelidos'];
 
@@ -57,11 +59,14 @@ exports.renderAdmin = async (req, res) => {
     .sort({ updatedAt: -1 }).limit(20);
   const usuarios     = await Usuario.find({}).select('username rol createdAt');
   const backgrounds  = await LoginBackground.find({}).populate('agregadaPor', 'username').sort({ createdAt: -1 });
+  const catalogo      = await AnimalModel.getAllWithEdits();
+  const catalogoEditable = AnimalModel.listAnimals(catalogo);
 
   res.render('adminPanel', {
     user: req.session.user,
     pendientes, historial, usuarios,
     backgrounds,
+    catalogoEditable,
     query: req.query
   });
 };
@@ -99,6 +104,72 @@ exports.crearUsuario = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.redirect('/admin?errorUsuario=1');
+  }
+};
+
+exports.actualizarAnimal = async (req, res) => {
+  try {
+    const {
+      categoriaId, subtipoSlug, animalIdx,
+      nombre, nombreCientifico, altura, peso, habitat,
+      alimentacion, edadMaxima, comportamiento, curiosidades,
+      conservacion, reino, filo, clase, orden, familia, imagen
+    } = req.body;
+
+    const idx = Number.parseInt(animalIdx, 10);
+    const categoria = AnimalModel.getById(categoriaId);
+    const subtipo = categoria && categoria.subtypes.find(s => AnimalModel.slugSubtype(s.name) === subtipoSlug);
+
+    if (!categoria || !subtipo || !subtipo.animales || !subtipo.animales[idx]) {
+      return res.redirect('/admin?animalError=1#catalogo');
+    }
+
+    const animalKey = AnimalModel.getAnimalKey(categoriaId, subtipoSlug, idx);
+    const admin = await Usuario.findOne({ username: req.session.user.username });
+    const imagenFinal = req.file ? `/uploads/${req.file.filename}` : (imagen || '').trim();
+    const curiosidadesArr = (curiosidades || '')
+      .split('\n')
+      .map(c => c.trim())
+      .filter(Boolean);
+
+    const campos = {
+      nombre: (nombre || '').trim(),
+      nombreCientifico: (nombreCientifico || '').trim(),
+      altura: (altura || '').trim(),
+      peso: (peso || '').trim(),
+      habitat: (habitat || '').trim(),
+      alimentacion: (alimentacion || '').trim(),
+      edadMaxima: (edadMaxima || '').trim(),
+      comportamiento: (comportamiento || '').trim(),
+      curiosidades: curiosidadesArr,
+      conservacion: (conservacion || '').trim(),
+      reino: (reino || '').trim(),
+      filo: (filo || '').trim(),
+      clase: (clase || '').trim(),
+      orden: (orden || '').trim(),
+      familia: (familia || '').trim(),
+      imagen: imagenFinal
+    };
+
+    await AnimalEdit.findOneAndUpdate(
+      { animalKey },
+      {
+        $set: {
+          animalKey,
+          categoriaId,
+          subtipoSlug,
+          animalIdx: idx,
+          campos,
+          actualizadoPor: admin ? admin._id : null
+        }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
+
+    res.redirect(`/admin?animalActualizado=1&animal=${encodeURIComponent(animalKey)}#catalogo`);
+  } catch (err) {
+    console.error(err);
+    res.redirect('/admin?animalError=1#catalogo');
   }
 };
 
